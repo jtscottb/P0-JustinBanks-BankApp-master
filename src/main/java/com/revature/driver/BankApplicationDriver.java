@@ -1,8 +1,7 @@
 package com.revature.driver;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 import com.revature.beans.Account;
 import com.revature.beans.Account.AccountType;
@@ -22,19 +21,38 @@ public class BankApplicationDriver {
 		System.out.println("Would you like to register? (Yes/No): ");
 		String registration = input.next().toUpperCase();
 		
-		if(registration == "YES") {Register();}
-		
-		Register();
+		if(registration.matches("YES")) {
+			Register();
+		}
 		input.close();
 	}
 	
-	public static void Register() {
+	public static void CreateNewLoginFile(String uname, String pword) {
+		try {
+			File newFile = new File(uname+".txt");
+			if(newFile.createNewFile()) {
+				FileWriter newWriter = new FileWriter(newFile);
+				newWriter.write(pword);
+				newWriter.close();
+			} else {
+				System.out.println("User already exists!");
+			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public static User Register() {
 		Scanner info = new Scanner(System.in);
 		
 		User customer = new User();
 		
-		int id = 001;
-		customer.setId(id);
+		//Increasing id of user as a user is registered.
+		SortedSet<Integer> idList = new TreeSet<Integer>();
+		idList.add(0);
+		int max = Collections.max(idList);
+		idList.add(max+1);
+		customer.setId(max+1);
 		
 		System.out.println("Enter username: ");
 		String username = info.next();
@@ -54,19 +72,28 @@ public class BankApplicationDriver {
 		
 		System.out.println("Enter Customer or Employee: ");
 		String userType = info.next().toUpperCase();
-		if(userType == "CUSTOMER") {
-			customer.setUserType(UserType.CUSTOMER);
-		} else {
-			customer.setUserType(UserType.EMPLOYEE);
+		switch(userType) {
+			case "CUSTOMER":
+				customer.setUserType(UserType.CUSTOMER);
+				break;
+			case "EMPLOYEE":
+				customer.setUserType(UserType.EMPLOYEE);
+				break;
+			default:
+				System.out.println("Spelling error! Enter Customer or Employee");
+				Register();
+				break;
 		}
 		
-		List<Account> myAccounts = new ArrayList<Account>();
+		List<Account> myAccounts = new ArrayList<>();
 		myAccounts.add(NewAccount());
 		customer.setAccounts(myAccounts);
 		
+		CreateNewLoginFile(username, password);
 		System.out.println(customer);
 		
 		info.close();
+		return customer;
 	}
 	
 	public static Account NewAccount() {
@@ -74,11 +101,18 @@ public class BankApplicationDriver {
 		Account account = new Account();
 		
 		System.out.println("Enter Checking or Savings");
-		String type = in.next().toUpperCase();
-		if(type == "CHECKING") {
-			account.setType(AccountType.CHECKING);
-		} else {
-			account.setType(AccountType.SAVINGS);
+		String accountType = in.next().toUpperCase();
+		switch(accountType) {
+			case "CHECKING":
+				account.setType(AccountType.CHECKING);
+				break;
+			case "SAVINGS":
+				account.setType(AccountType.SAVINGS);
+				break;
+			default:
+				System.out.println("Spelling Error!");
+				NewAccount();
+				break;
 		}
 		
 		int accountID = 005;
@@ -94,13 +128,13 @@ public class BankApplicationDriver {
 		
 		System.out.println("Approved (Yes/No): ");
 		String approval = in.next().toUpperCase();
-		if(approval == "YES") {
+		if(approval.matches("YES")) {
 			account.setApproved(true);
 		} else {
 			account.setApproved(false);
 		}
 		
-//		List<Transaction> myTransactions = new ArrayList<Transaction>();
+//		List<Transaction> myTransactions = new ArrayList<>();
 //		myTransactions.add(Transactions());
 		account.setTransactions(null);
 		
@@ -113,13 +147,21 @@ public class BankApplicationDriver {
 		Transaction action = new Transaction();
 		
 		System.out.println("Deposit, Withdrawal, or Transfer?");
-		String type = input.next().toUpperCase();
-		if(type == "DEPOSIT") {
-			action.setType(TransactionType.DEPOSIT);
-		} else if(type == "WITHDRAWAL") {
-			action.setType(TransactionType.WITHDRAWAL);
-		} else {
-			action.setType(TransactionType.TRANSFER);
+		String transactionType = input.next().toUpperCase();
+		switch(transactionType) {
+			case "DEPOSIT":
+				action.setType(TransactionType.DEPOSIT);
+				break;
+			case "WITHDRAWAL":
+				action.setType(TransactionType.WITHDRAWAL);
+				break;
+			case "TRANSFER":
+				action.setType(TransactionType.TRANSFER);
+				break;
+			default:
+				System.out.println("Spelling Error!");
+				NewTransaction();
+				break;
 		}
 		
 		System.out.println("Enter account number: ");
