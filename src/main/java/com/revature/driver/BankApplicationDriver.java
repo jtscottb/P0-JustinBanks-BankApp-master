@@ -60,7 +60,6 @@ public class BankApplicationDriver {
 		
 //		STORE WHO'S LOGGED ON
 		SessionCache.setCurrentUser(u);
-		input.close();
 	}
 	
 	public static void Selection() {

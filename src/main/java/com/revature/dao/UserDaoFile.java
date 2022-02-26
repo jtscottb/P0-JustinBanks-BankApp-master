@@ -58,7 +58,7 @@ public class UserDaoFile implements UserDao {
 			File[] files = new File(fileLocation).listFiles();
 			for(File file : files) {
 				String doc = file.getName();
-				if(doc == userId.toString()) {
+				if(doc.matches(userId.toString())) {
 					FileInputStream fileIn = new FileInputStream(new File(fileLocation + "\\" + doc));
 					ObjectInputStream objectIn = new ObjectInputStream(fileIn);
 					User user = (User) objectIn.readObject();
