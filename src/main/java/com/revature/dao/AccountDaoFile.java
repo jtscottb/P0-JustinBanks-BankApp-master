@@ -1,16 +1,21 @@
 package com.revature.dao;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.revature.beans.Account;
 import com.revature.beans.User;
+import com.revature.beans.Account.AccountType;
 
 /**
  * Implementation of AccountDAO which reads/writes to files
  */
 public class AccountDaoFile implements AccountDao {
 	// use this file location to persist the data to
-	public static String fileLocation = "";
+	public static String fileLocation = ".\\Accounts";
 
 	public Account addAccount(Account a) {
 		// TODO Auto-generated method stub
