@@ -1,6 +1,12 @@
 package com.revature.services;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -11,6 +17,7 @@ import com.revature.beans.User;
 import com.revature.beans.Account.AccountType;
 import com.revature.beans.Transaction.TransactionType;
 import com.revature.dao.AccountDao;
+import com.revature.dao.AccountDaoFile;
 import com.revature.exceptions.OverdraftException;
 import com.revature.utils.SessionCache;
 
@@ -115,6 +122,7 @@ public class AccountService {
 	public Account createNewAccount(User u) {
 		Account account = new Account();
 		Scanner input = new Scanner(System.in);
+		int accountID = 0;
 		
 		System.out.println("Enter Checking or Savings");
 		String accountType = input.next().toUpperCase();
@@ -130,8 +138,42 @@ public class AccountService {
 			break;
 		}
 		
-		int accountID = 1;
-		account.setId(accountID);
+		//code to find the next available account number
+		try {
+			File[] files = new File("Users").listFiles();
+			for(File file : files) {
+				String doc = file.getName();
+				FileInputStream fileIn = new FileInputStream(new File("Users\\" + doc));
+				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+				User user = (User) objectIn.readObject();
+				
+				List<Account> act = new ArrayList();
+				act.addAll(user.getAccounts());
+				for(Account a : act) {
+					if(accountID < a.getId()) {
+						accountID = a.getId();
+					}
+				}
+				objectIn.close();
+				fileIn.close();
+			}
+		} catch (FileNotFoundException e) {
+			// TODO: handle exception
+			System.out.println("File not found");
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			System.out.println("User could not be located");
+		} catch (ClassNotFoundException e) {
+			System.out.println("User is not defined");
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		account.setId(accountID + 1);
+		//end account number code
 		
 		account.setOwnerId(u.getId());
 		account.setBalance(STARTING_BALANCE);
@@ -140,13 +182,18 @@ public class AccountService {
 		String approve = input.next();
 		account.setApproved(approveOrRejectAccount(account, approve.matches(approve)));
 		
-		List<Transaction> myTransactions = new ArrayList<>();
-		Transaction t = new Transaction();
-		t.setAmount(STARTING_BALANCE);
-		t.setTimestamp();
-		t.setType(TransactionType.DEPOSIT);
-		myTransactions.add(t);
-		account.setTransactions(myTransactions);
+		if() {
+			List<Transaction> myTransactions = new ArrayList<>();
+			Transaction t = new Transaction();
+			t.setAmount(STARTING_BALANCE);
+			t.setTimestamp();
+			t.setType(TransactionType.DEPOSIT);
+			myTransactions.add(t);
+			account.setTransactions(myTransactions);
+		} else {
+			AccountDaoFile adf = new AccountDaoFile();
+			adf.addAccount(account);
+		}
 		
 		return account;
 	}

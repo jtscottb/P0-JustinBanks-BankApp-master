@@ -32,11 +32,12 @@ public class UserDaoFile implements UserDao {
 		// TODO Auto-generated method stub
 		
 		try {
-			FileOutputStream fileOut = new FileOutputStream(fileLocation + "\\" + user.getId() + ".txt", true);
+			FileOutputStream fileOut = new FileOutputStream(fileLocation + "\\" + user.getId() + ".txt");
 			ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 			objectOut.writeObject(user);
 			objectOut.close();
 			fileOut.close();
+			return user;
 		} catch (FileNotFoundException e) {
 			// TODO: handle exception
 			System.out.println("File could not be saved.");
@@ -57,15 +58,14 @@ public class UserDaoFile implements UserDao {
 		try {
 			File[] files = new File(fileLocation).listFiles();
 			for(File file : files) {
-				String doc = file.getName();
+				String doc = file.getName().split(".", 2)[0];
 				if(doc.matches(userId.toString())) {
-					FileInputStream fileIn = new FileInputStream(new File(fileLocation + "\\" + doc));
+					FileInputStream fileIn = new FileInputStream(fileLocation + "\\" + doc);
 					ObjectInputStream objectIn = new ObjectInputStream(fileIn);
 					User user = (User) objectIn.readObject();
-					
-					System.out.println(user);
 					objectIn.close();
 					fileIn.close();
+					return user;
 				} else {
 					throw new FileNotFoundException("Could not find file");
 				}
@@ -95,7 +95,7 @@ public class UserDaoFile implements UserDao {
 			for(File file : files) {
 				
 				String doc = file.getName();
-				FileInputStream fileIn = new FileInputStream(new File(fileLocation + "\\" + doc));
+				FileInputStream fileIn = new FileInputStream(fileLocation + "\\" + doc);
 				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
 				User user = (User) objectIn.readObject();
 				
@@ -110,8 +110,6 @@ public class UserDaoFile implements UserDao {
 					}
 				}
 			}
-		} catch(EOFException e) {
-			System.out.println("End of file");
 		} catch(FileNotFoundException e) {
 			System.out.println("User is not found");
 			e.printStackTrace();
@@ -129,36 +127,74 @@ public class UserDaoFile implements UserDao {
 
 	public List<User> getAllUsers() {
 		// TODO Auto-generated method stub
-		//open file in input stream
-		//create list for users
-		//while file has more content
-		//	add user to list
-		//return list
+		List<User> users = new ArrayList<User>();
+		
+		try {
+			File[] files = new File(fileLocation).listFiles();
+			for(File file : files) {
+				String doc = file.getName();
+				FileInputStream fileIn = new FileInputStream(fileLocation + "\\" + doc);
+				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+				User user = (User) objectIn.readObject();
+				users.add(user);
+				
+				objectIn.close();
+				fileIn.close();
+			}
+			return users;
+		} catch(FileNotFoundException e) {
+			System.out.println("User is not found");
+			e.printStackTrace();
+		} catch(IOException e) {
+			System.out.println("Could not return user");
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			System.out.println("User not found. You must register first");
+			e.printStackTrace();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
 	public User updateUser(User u) {
 		// TODO Auto-generated method stub
-		//open file in input stream
-		//while file has more content
-		//	read object into user
-		//	see if user == u
-		//	if true write new user, if not writ old
-		//return updated user
+		try {
+			File[] files = new File(fileLocation).listFiles();
+			for(File file : files) {
+				String doc = file.getName();
+				
+				if(u.getId() == Integer.parseInt(doc.split(".", 2)[0])) {
+					FileOutputStream fileOut = new FileOutputStream(fileLocation + "\\" + doc);
+					ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+					objectOut.writeObject(u);
+					
+					objectOut.close();
+					fileOut.close();
+					return u;
+				}
+			}
+		} catch(FileNotFoundException e) {
+			System.out.println("User is not found");
+			e.printStackTrace();
+		} catch(IOException e) {
+			System.out.println("Could not return user");
+			e.printStackTrace();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
 	public boolean removeUser(User u) {
 		// TODO Auto-generated method stub
-		//open file in input stream
-		//while file has more content
-		//	read object into user
-		//	see if userid/username == u.userid
-		//		if not write user to file
-		//		if matches -- dont write
-		//return true if found, false if not
-
-		
+		File[] files = new File(fileLocation).listFiles();
+		for(File file : files) {
+			String doc = file.getName();
+			if( u.getId() == Integer.parseInt(doc.split(".", 2)[0]) ) {
+				return file.delete();
+			}
+		}
 		return false;
 	}
 
