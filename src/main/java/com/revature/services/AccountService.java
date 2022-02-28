@@ -53,6 +53,8 @@ public class AccountService {
 			action.setTimestamp();
 			a.setBalance(a.getBalance() - amount);
 			a.getTransactions().add(action);
+			AccountDaoFile adfs = new AccountDaoFile();
+			adfs.updateAccount(a);
 		}
 	}
 	
@@ -73,6 +75,8 @@ public class AccountService {
 			action.setTimestamp();
 			a.setBalance(a.getBalance() + amount);
 			a.getTransactions().add(action);
+			AccountDaoFile adfs = new AccountDaoFile();
+			adfs.updateAccount(a);
 		}
 	}
 	
@@ -103,6 +107,8 @@ public class AccountService {
 			sender.setTimestamp();
 			fromAct.setBalance(fromAct.getBalance() - amount);
 			fromAct.getTransactions().add(sender);
+			AccountDaoFile adfs = new AccountDaoFile();
+			adfs.updateAccount(fromAct);
 			
 			Transaction receiver = new Transaction();
 			receiver.setType(TransactionType.TRANSFER);
@@ -112,6 +118,8 @@ public class AccountService {
 			receiver.setTimestamp();
 			toAct.setBalance(toAct.getBalance() + amount);
 			toAct.getTransactions().add(receiver);
+			AccountDaoFile adfr = new AccountDaoFile();
+			adfr.updateAccount(fromAct);
 		}
 	}
 	
@@ -122,7 +130,6 @@ public class AccountService {
 	public Account createNewAccount(User u) {
 		Account account = new Account();
 		Scanner input = new Scanner(System.in);
-		int accountID = 0;
 		
 		System.out.println("Enter Checking or Savings");
 		String accountType = input.next().toUpperCase();
@@ -139,38 +146,38 @@ public class AccountService {
 		}
 		
 		//code to find the next available account number
-		try {
-			File[] files = new File("Users").listFiles();
-			for(File file : files) {
-				String doc = file.getName();
-				FileInputStream fileIn = new FileInputStream(new File("Users\\" + doc));
+		int accountID = 0;
+		User user = null;
+		File[] files = new File("Users").listFiles();
+		for(File file : files) {
+			try {
+				FileInputStream fileIn = new FileInputStream(new File("Users\\" + file.getName()));
 				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-				User user = (User) objectIn.readObject();
-				
-				List<Account> act = new ArrayList();
-				act.addAll(user.getAccounts());
-				for(Account a : act) {
-					if(accountID < a.getId()) {
-						accountID = a.getId();
-					}
-				}
+				user = (User) objectIn.readObject();
 				objectIn.close();
 				fileIn.close();
+			} catch (FileNotFoundException e) {
+				// TODO: handle exception
+				System.out.println("File not found");
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				System.out.println("User could not be located");
+			} catch (ClassNotFoundException e) {
+				System.out.println("User is not defined");
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
 			}
-		} catch (FileNotFoundException e) {
-			// TODO: handle exception
-			System.out.println("File not found");
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO: handle exception
-			e.printStackTrace();
-			System.out.println("User could not be located");
-		} catch (ClassNotFoundException e) {
-			System.out.println("User is not defined");
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
+			List<Account> act = new ArrayList<Account>();
+			act.addAll(user.getAccounts());
+			for(Account a : act) {
+				if(accountID < a.getId()) {
+					accountID = a.getId();
+				}
+			}
 		}
 		account.setId(accountID + 1);
 		//end account number code
@@ -182,18 +189,17 @@ public class AccountService {
 		String approve = input.next();
 		account.setApproved(approveOrRejectAccount(account, approve.matches(approve)));
 		
-		if() {
-			List<Transaction> myTransactions = new ArrayList<>();
-			Transaction t = new Transaction();
-			t.setAmount(STARTING_BALANCE);
-			t.setTimestamp();
-			t.setType(TransactionType.DEPOSIT);
-			myTransactions.add(t);
-			account.setTransactions(myTransactions);
-		} else {
-			AccountDaoFile adf = new AccountDaoFile();
-			adf.addAccount(account);
-		}
+		List<Transaction> myTransactions = new ArrayList<>();
+		Transaction t = new Transaction();
+		t.setAmount(STARTING_BALANCE);
+		t.setTimestamp();
+		t.setType(TransactionType.DEPOSIT);
+		myTransactions.add(t);
+		
+		account.setTransactions(myTransactions);
+		AccountDaoFile adf = new AccountDaoFile();
+		adf.addAccount(account);
+		System.out.println("Account added");
 		
 		return account;
 	}

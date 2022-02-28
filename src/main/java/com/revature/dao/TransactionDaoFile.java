@@ -30,9 +30,11 @@ public class TransactionDaoFile implements TransactionDao {
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				User user = (User) ois.readObject();
 				aList.addAll(user.getAccounts());
+				
 				for(Account i : aList) {
 					tList.addAll(i.getTransactions());
 				}
+				
 				ois.close();
 				fis.close();
 			} catch (FileNotFoundException e) {

@@ -53,11 +53,15 @@ public class UserService {
 		
 		File[] files = new File("Users").listFiles();
 		String doc = null;
-		for(File f : files) {
-			doc = f.getName();
-			
+		int nextID = 0;
+		if(files.length == 0) {
+			nextID = 1;
+		} else {
+			for(File f : files) {
+				doc = f.getName();
+			}
+			nextID = Integer.parseInt(doc.split("\\.", 2)[0]) + 1;
 		}
-		int nextID = Integer.parseInt(doc.split("\\.", 2)[0]) + 1;
 		newUser.setId(nextID);
 
 		System.out.println("Enter username: ");
@@ -87,6 +91,7 @@ public class UserService {
 			break;
 		default:
 			System.out.println("Spelling error!");
+			input.close();
 			break;
 		}
 		

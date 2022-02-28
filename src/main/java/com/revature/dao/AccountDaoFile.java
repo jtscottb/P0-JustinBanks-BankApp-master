@@ -27,27 +27,27 @@ public class AccountDaoFile implements AccountDao {
 
 	public Account addAccount(Account a) {
 		// TODO Auto-generated method stub
-		List<Account> accounts;
-
-		return null;
-	}
-
-	public Account getAccount(Integer actId) {
-		// TODO Auto-generated method stub
-		List<Account> accounts;
+		List<Account> accounts = null;
+		User user = null;
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File file : files) {
+			
 			try {
 				FileInputStream fis = new FileInputStream(fileLocation + "\\" + file.getName());
 				ObjectInputStream ois = new ObjectInputStream(fis);
-				User user = (User) ois.readObject();
-				accounts = user.getAccounts();
-				for(Account a : accounts) {
-					if(actId == a.getId()) {
-						return a;
-					}
+				user = (User) ois.readObject();
+
+				if(a.getOwnerId() == user.getId()) {
+					accounts = user.getAccounts();
+					accounts.add(a);
+					user.setAccounts(accounts);
+					UserDaoFile udf = new UserDaoFile();
+					udf.updateUser(user);
+					System.out.println("Account added");
+					break;
 				}
+				
 				ois.close();
 				fis.close();
 			} catch (FileNotFoundException e) {
@@ -60,8 +60,48 @@ public class AccountDaoFile implements AccountDao {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
 		}
-		return null;
+		return a;
+	}
+
+	public Account getAccount(Integer actId) {
+		// TODO Auto-generated method stub
+		List<Account> accounts;
+		User user = null;
+		Account account = null;
+		File[] files = new File(fileLocation).listFiles();
+		
+		for(File file : files) {
+			
+			try {
+				FileInputStream fis = new FileInputStream(fileLocation + "\\" + file.getName());
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				user = (User) ois.readObject();
+				
+				accounts = user.getAccounts();
+				for(Account a : accounts) {
+					if(actId == a.getId()) {
+						account = a;
+						break;
+					}
+				}
+				
+				ois.close();
+				fis.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		return account;
 	}
 
 	public List<Account> getAccounts() {
@@ -93,12 +133,14 @@ public class AccountDaoFile implements AccountDao {
 
 	public List<Account> getAccountsByUser(User u) {
 		// TODO Auto-generated method stub
-		List<Account> accounts;
+		List<Account> accounts = null;
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File file : files) {
-			int docID = Integer.parseInt(file.getName().split(".", 2)[0]);
+			
+			int docID = Integer.parseInt(file.getName().split("\\.", 2)[0]);
 			if(u.getId() == docID) {
+				
 				try {
 					FileInputStream fis = new FileInputStream(fileLocation + "\\" + file.getName());
 					ObjectInputStream ois = new ObjectInputStream(fis);
@@ -106,7 +148,6 @@ public class AccountDaoFile implements AccountDao {
 					accounts = user.getAccounts();
 					ois.close();
 					fis.close();
-					return accounts;
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -117,19 +158,103 @@ public class AccountDaoFile implements AccountDao {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				break;
 			}
+			
 		}
-		return null;
+		return accounts;
 	}
 
 	public Account updateAccount(Account a) {
 		// TODO Auto-generated method stub
-		return null;
+		List<Account> accounts = null;
+		User user = null;
+		int pos = 0;
+		File[] files = new File(fileLocation).listFiles();
+		
+		for(File file : files) {
+			
+			try {
+				FileInputStream fis = new FileInputStream(fileLocation + "\\" + file.getName());
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				user = (User) ois.readObject();
+				
+				if(a.getOwnerId() == user.getId()) {
+					accounts = user.getAccounts();
+					
+					for(Account i : accounts) {
+						
+						if(i.getId() == a.getId()) {
+							pos = accounts.indexOf(i);
+							accounts.remove(pos);
+							accounts.add(pos, a);
+							user.setAccounts(accounts);
+							UserDaoFile udf = new UserDaoFile();
+							udf.updateUser(user);
+							System.out.println("Account updated");
+							break;
+						}
+					}
+					break;
+				}
+				
+				ois.close();
+				fis.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		return accounts.get(pos);
 	}
 
 	public boolean removeAccount(Account a) {
 		// TODO Auto-generated method stub
-		return false;
+		List<Account> accounts;
+		User user = null;
+		boolean removed = false;
+		File[] files = new File(fileLocation).listFiles();
+		
+		for(File file : files) {
+			
+			try {
+				FileInputStream fis = new FileInputStream(fileLocation + "\\" + file.getName());
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				user = (User) ois.readObject();
+				
+				if(a.getOwnerId() == user.getId()) {
+					accounts = user.getAccounts();
+					removed = accounts.remove(a);
+					user.setAccounts(accounts);
+					UserDaoFile udf = new UserDaoFile();
+					udf.updateUser(user);
+					System.out.println("Account removed");
+					break;
+				}
+				
+				ois.close();
+				fis.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		return removed;
 	}
 
 }
