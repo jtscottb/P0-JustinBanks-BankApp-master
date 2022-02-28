@@ -64,12 +64,32 @@ public class BankApplicationDriver {
 		User u = us.login(username, password);
 		
 //		STORE WHO'S LOGGED ON
+		System.out.println(u);
 		SessionCache.setCurrentUser(u);
 		return u;
 	}
 	
 	public static void Selection(User user) {
 		Scanner input = new Scanner(System.in);
+		
+		if(user.getUserType().equals(UserType.CUSTOMER)) {
+			//As a customer, I can apply for a new bank account with a starting balance
+			//As a customer, I can view the balance of a specific account
+			//As a customer, I can make a deposit to a specific account
+			//As a customer, I can make a withdrawal from a specific account
+			//As a customer, I can post a money transfer to another account.
+		} else if(user.getUserType().equals(UserType.EMPLOYEE)) {
+			//As an employee, I can approve or reject an account.
+			//As an employee, I can view a log of all transactions.
+		}
+		//SYSTEM
+			//As the system, I reject registration attempts for usernames that already exist
+			//As the system, I reject login attempts with invalid credentials
+			//As the system, I reject and prevent overdrafts
+			//As the system, I reject deposits or withdrawals of negative money
+			//As the system, I reject any transactions of unapproved accounts
+			//As the system, I reject invalid transfers (negative amounts or overdrafts)
+		
 		System.out.println("What would you like to do?: "
 				+ "\nApply for new account (Type new account)"
 				+ "\nView balance of my account (Type view balance)"

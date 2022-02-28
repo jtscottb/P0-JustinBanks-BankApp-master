@@ -18,6 +18,8 @@ import com.revature.dao.AccountDao;
 import com.revature.dao.AccountDaoFile;
 import com.revature.dao.UserDao;
 import com.revature.dao.UserDaoFile;
+import com.revature.driver.BankApplicationDriver;
+import com.revature.exceptions.InvalidCredentialsException;
 
 /**
  * This class should contain the business logic for performing operations on users
@@ -40,6 +42,11 @@ public class UserService {
 	public User login(String username, String password) {
 		UserDaoFile udf = new UserDaoFile();
 		User user = (User) udf.getUser(username, password);
+		if(user == null) {
+			System.out.println("Incorrect username or password");
+//			BankApplicationDriver.SignIn();
+			throw new InvalidCredentialsException();
+		}
 		return user;
 	}
 	
@@ -96,8 +103,7 @@ public class UserService {
 		}
 		
 		List<Account> myAccounts = new ArrayList<>();
-		AccountService a = new AccountService(accountDao);
-		myAccounts.add(a.createNewAccount(newUser));
+		myAccounts = null;
 		newUser.setAccounts(myAccounts);
 		
 //		Write New User to a File

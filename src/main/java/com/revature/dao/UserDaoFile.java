@@ -91,7 +91,7 @@ public class UserDaoFile implements UserDao {
 	public User getUser(String username, String pass) {
 		// TODO Auto-generated method stub
 		String doc;
-		User user = null;
+		User u = null;
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File file : files) {
@@ -100,18 +100,16 @@ public class UserDaoFile implements UserDao {
 			try {
 				FileInputStream fileIn = new FileInputStream(fileLocation + "\\" + doc);
 				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-				user = (User) objectIn.readObject();
+				User user = (User) objectIn.readObject();
 				objectIn.close();
 				fileIn.close();
 				
 				if(username.matches(user.getUsername())) {
 					
 					if(pass.matches(user.getPassword())) {
+						u = user;
 						System.out.println("Log in successful");
 						break;	
-					} else {
-						System.out.println("Incorrect password");
-						throw new InvalidCredentialsException();
 					}
 					
 				}
@@ -129,7 +127,7 @@ public class UserDaoFile implements UserDao {
 				e.printStackTrace();
 			}
 		}
-		return user;
+		return u;
 	}
 
 	public List<User> getAllUsers() {
