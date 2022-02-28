@@ -64,7 +64,7 @@ public class AccountService {
 	 */
 	public void deposit(Account a, Double amount) {
 		
-		if (!a.isApproved()) {
+		if (amount < 0) {
 			throw new UnsupportedOperationException();
 		} else {
 			Transaction action = new Transaction();
@@ -154,6 +154,15 @@ public class AccountService {
 				FileInputStream fileIn = new FileInputStream(new File("Users\\" + file.getName()));
 				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
 				user = (User) objectIn.readObject();
+				
+				List<Account> act = new ArrayList<Account>();
+				act.addAll(user.getAccounts());
+				for(Account a : act) {
+					if(accountID < a.getId()) {
+						accountID = a.getId();
+					}
+				}
+				
 				objectIn.close();
 				fileIn.close();
 			} catch (FileNotFoundException e) {
@@ -171,13 +180,6 @@ public class AccountService {
 				// TODO: handle exception
 				e.printStackTrace();
 			}
-			List<Account> act = new ArrayList<Account>();
-			act.addAll(user.getAccounts());
-			for(Account a : act) {
-				if(accountID < a.getId()) {
-					accountID = a.getId();
-				}
-			}
 		}
 		account.setId(accountID + 1);
 		//end account number code
@@ -186,8 +188,9 @@ public class AccountService {
 		account.setBalance(STARTING_BALANCE);
 		
 		System.out.println("Account approved (Yes/No): ");
-		String approve = input.next();
-		account.setApproved(approveOrRejectAccount(account, approve.matches(approve)));
+		String approve = input.next().toUpperCase();
+		boolean b = (approve.matches("YES")) ? true : false;
+		account.setApproved(b);
 		
 		List<Transaction> myTransactions = new ArrayList<>();
 		Transaction t = new Transaction();
