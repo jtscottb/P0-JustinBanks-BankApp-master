@@ -145,18 +145,18 @@ public class AccountService {
 		Account account = new Account();
 		Scanner input = new Scanner(System.in);
 		
-		System.out.println("Enter Checking or Savings");
-		String accountType = input.next().toUpperCase();
+		System.out.println("Enter \n(1.) Checking or \n(2.) Savings");
+		int accountType = input.nextInt();
 		switch(accountType) {
-		case "CHECKING":
+		case 1:
 			account.setType(AccountType.CHECKING);
 			break;
-		case "SAVINGS":
+		case 2:
 			account.setType(AccountType.SAVINGS);
 			break;
 		default:
-			System.out.println("Spelling Error!");
-			break;
+			System.out.println("Enter 1 for Checking or 2 for Savings");
+			input.close();
 		}
 		
 		//code to find the next available account number
