@@ -55,7 +55,7 @@ public class UserDaoFile implements UserDao {
 
 	public User getUser(Integer userId) {
 		// TODO Auto-generated method stub
-		User user = null;
+		User user = new User();
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File file : files) {
@@ -91,7 +91,7 @@ public class UserDaoFile implements UserDao {
 	public User getUser(String username, String pass) {
 		// TODO Auto-generated method stub
 		String doc;
-		User u = null;
+		User u = new User();
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File file : files) {
@@ -132,29 +132,29 @@ public class UserDaoFile implements UserDao {
 
 	public List<User> getAllUsers() {
 		// TODO Auto-generated method stub
-		List<User> users = null;
+		List<User> users = new ArrayList<User>();
 		File[] files = new File(fileLocation).listFiles();
 		
-		for(File file : files) {
-			try {
+		try {
+			for(File file : files) {
 				FileInputStream fileIn = new FileInputStream(fileLocation + "\\" + file.getName());
 				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
 				User user = (User) objectIn.readObject();
 				users.add(user);
 				objectIn.close();
 				fileIn.close();
-			} catch(FileNotFoundException e) {
-				System.out.println("User is not found");
-				e.printStackTrace();
-			} catch(IOException e) {
-				System.out.println("Could not return user");
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				System.out.println("User not found. You must register first");
-				e.printStackTrace();
-			} catch(Exception e) {
-				e.printStackTrace();
 			}
+		} catch(FileNotFoundException e) {
+			System.out.println("User is not found");
+			e.printStackTrace();
+		} catch(IOException e) {
+			System.out.println("Could not return user");
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			System.out.println("User not found. You must register first");
+			e.printStackTrace();
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 		return users;
 	}

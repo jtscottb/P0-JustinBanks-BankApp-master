@@ -22,32 +22,15 @@ public class TransactionDaoFile implements TransactionDao {
 		// TODO Auto-generated method stub
 		List<Transaction> tList = new ArrayList<Transaction>();
 		List<Account> aList = new ArrayList<Account>();
-		File[] files = new File(fileLocation).listFiles();
-		
-		for(File file : files) {
-			try {
-				FileInputStream fis = new FileInputStream(fileLocation + "\\" + file.getName());
-				ObjectInputStream ois = new ObjectInputStream(fis);
-				User user = (User) ois.readObject();
-				aList.addAll(user.getAccounts());
-				
-				for(Account i : aList) {
-					tList.addAll(i.getTransactions());
-				}
-				
-				ois.close();
-				fis.close();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		AccountDaoFile adf = new AccountDaoFile();
+		aList = adf.getAccounts();
+		for(Account a : aList) {
+			if(a.getTransactions() == null) {
+				aList.remove(a);
 			}
 		}
+		aList.forEach((a) -> tList.addAll(a.getTransactions()));
+		
 		tList.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
 		return tList;
 	}

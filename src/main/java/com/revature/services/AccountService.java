@@ -43,8 +43,11 @@ public class AccountService {
 		if(a.getBalance() < amount) {
 			throw new OverdraftException();
 		} else if(amount < 0) {
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException("Cannot withdraw a negative amount");
+		} else if(!a.isApproved()) {
+			throw new UnsupportedOperationException("Account not approved");
 		} else {
+			List<Transaction> list = new ArrayList<Transaction>();
 			Transaction action = new Transaction();
 			action.setType(TransactionType.WITHDRAWAL);
 			action.setSender(null);
@@ -52,7 +55,10 @@ public class AccountService {
 			action.setAmount(amount);
 			action.setTimestamp();
 			a.setBalance(a.getBalance() - amount);
-			a.getTransactions().add(action);
+			list.addAll(a.getTransactions());
+			list.add(action);
+			
+			a.setTransactions(list);
 			AccountDaoFile adfs = new AccountDaoFile();
 			adfs.updateAccount(a);
 		}
@@ -63,18 +69,26 @@ public class AccountService {
 	 * @throws UnsupportedOperationException if amount is negative
 	 */
 	public void deposit(Account a, Double amount) {
-		
 		if (amount < 0) {
 			throw new UnsupportedOperationException();
+		} else if(!a.isApproved()) {
+			throw new UnsupportedOperationException("Account not approved");
 		} else {
+			List<Transaction> list = new ArrayList<Transaction>();
 			Transaction action = new Transaction();
 			action.setType(TransactionType.DEPOSIT);
-			action.setSender(null);
-			action.setRecipient(a);
+			action.setSender(a);
+			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
 			a.setBalance(a.getBalance() + amount);
-			a.getTransactions().add(action);
+			list.addAll(a.getTransactions());
+			
+			System.out.println(list.add(action));
+			
+			a.setTransactions(list);
+			System.out.println(a);
+
 			AccountDaoFile adfs = new AccountDaoFile();
 			adfs.updateAccount(a);
 		}
@@ -147,22 +161,24 @@ public class AccountService {
 		
 		//code to find the next available account number
 		int accountID = 0;
-		User user = null;
+		User user = new User();
 		File[] files = new File("Users").listFiles();
+		List<Account> act = new ArrayList<Account>();
+		
 		for(File file : files) {
 			try {
 				FileInputStream fileIn = new FileInputStream(new File("Users\\" + file.getName()));
 				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
 				user = (User) objectIn.readObject();
 				
-				List<Account> act = new ArrayList<Account>();
-				act.addAll(user.getAccounts());
+				if(user.getAccounts() != null) {
+					act.addAll(user.getAccounts());
+				}
 				for(Account a : act) {
 					if(accountID < a.getId()) {
 						accountID = a.getId();
 					}
 				}
-				
 				objectIn.close();
 				fileIn.close();
 			} catch (FileNotFoundException e) {
@@ -200,9 +216,7 @@ public class AccountService {
 		myTransactions.add(t);
 		
 		account.setTransactions(myTransactions);
-		AccountDaoFile adf = new AccountDaoFile();
-		adf.addAccount(account);
-		System.out.println("Account added");
+		System.out.println("Account created");
 		
 		return account;
 	}

@@ -3,8 +3,10 @@ package com.revature.dao;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +19,7 @@ import com.revature.beans.User;
 import com.revature.services.AccountService;
 import com.revature.utils.SessionCache;
 import com.revature.beans.Account.AccountType;
+import com.revature.beans.Transaction;
 
 /**
  * Implementation of AccountDAO which reads/writes to files
@@ -27,29 +30,36 @@ public class AccountDaoFile implements AccountDao {
 
 	public Account addAccount(Account a) {
 		// TODO Auto-generated method stub
-		List<Account> accounts = null;
-		User user = null;
+		List<Account> accounts = new ArrayList<Account>();
+		User user = new User();
 		File[] files = new File(fileLocation).listFiles();
-		
 		for(File file : files) {
 			
 			try {
 				FileInputStream fis = new FileInputStream(fileLocation + "\\" + file.getName());
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				user = (User) ois.readObject();
+				ois.close();
+				fis.close();
 
-				if(a.getOwnerId() == user.getId()) {
-					accounts = user.getAccounts();
-					accounts.add(a);
-					user.setAccounts(accounts);
-					UserDaoFile udf = new UserDaoFile();
-					udf.updateUser(user);
+				if(a.getOwnerId().equals(user.getId())) {
+					if(user.getAccounts() == null) {
+						accounts.add(a);
+						user.setAccounts(accounts);
+					} else {
+						accounts = user.getAccounts();
+						accounts.add(a);
+						user.setAccounts(accounts);
+					}
+					FileOutputStream fos = new FileOutputStream(fileLocation + "\\" + file.getName());
+					ObjectOutputStream oos = new ObjectOutputStream(fos);
+					oos.writeObject(user);
+					oos.close();
+					fos.close();
 					System.out.println("Account added");
 					break;
 				}
-				
-				ois.close();
-				fis.close();
+	
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -67,9 +77,9 @@ public class AccountDaoFile implements AccountDao {
 
 	public Account getAccount(Integer actId) {
 		// TODO Auto-generated method stub
-		List<Account> accounts;
-		User user = null;
-		Account account = null;
+		List<Account> accounts = new ArrayList<Account>();
+		User user = new User();
+		Account account = new Account();
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File file : files) {
@@ -81,12 +91,11 @@ public class AccountDaoFile implements AccountDao {
 				
 				accounts = user.getAccounts();
 				for(Account a : accounts) {
-					if(actId == a.getId()) {
+					if(a.getId().equals(actId)) {
 						account = a;
 						break;
 					}
 				}
-				
 				ois.close();
 				fis.close();
 			} catch (FileNotFoundException e) {
@@ -107,33 +116,21 @@ public class AccountDaoFile implements AccountDao {
 	public List<Account> getAccounts() {
 		// TODO Auto-generated method stub
 		List<Account> accounts = new ArrayList<Account>();
-		File[] files = new File(fileLocation).listFiles();
-		
-		for(File file : files) {
-			try {
-				FileInputStream fis = new FileInputStream(fileLocation + "\\" + file.getName());
-				ObjectInputStream ois = new ObjectInputStream(fis);
-				User user = (User) ois.readObject();
-				accounts.addAll(user.getAccounts());
-				ois.close();
-				fis.close();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		List<User> users = new ArrayList<User>();
+		UserDaoFile udf = new UserDaoFile();
+		users = udf.getAllUsers();
+		for(User u : users) {
+			if(u.getAccounts() == null) {
+				users.remove(u);
 			}
 		}
+		users.forEach((u) -> accounts.addAll(u.getAccounts()));
 		return accounts;
 	}
 
 	public List<Account> getAccountsByUser(User u) {
 		// TODO Auto-generated method stub
-		List<Account> accounts = null;
+		List<Account> accounts = new ArrayList<Account>();
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File file : files) {
@@ -168,8 +165,8 @@ public class AccountDaoFile implements AccountDao {
 
 	public Account updateAccount(Account a) {
 		// TODO Auto-generated method stub
-		List<Account> accounts = null;
-		User user = null;
+		List<Account> accounts = new ArrayList<Account>();
+		User user = new User();
 		int pos = 0;
 		File[] files = new File(fileLocation).listFiles();
 		
@@ -180,25 +177,26 @@ public class AccountDaoFile implements AccountDao {
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				user = (User) ois.readObject();
 				
-				if(a.getOwnerId() == user.getId()) {
-					accounts = user.getAccounts();
-					
+				if(a.getOwnerId().equals(user.getId())) {
+					accounts.addAll(user.getAccounts());
 					for(Account i : accounts) {
 						
-						if(i.getId() == a.getId()) {
+						if(i.getId().equals(a.getId())) {
 							pos = accounts.indexOf(i);
 							accounts.remove(pos);
-							accounts.add(pos, a);
+							System.out.println(accounts.add(a));
+							System.out.println(accounts);
+							
 							user.setAccounts(accounts);
+							System.out.println(user);
+							
 							UserDaoFile udf = new UserDaoFile();
 							udf.updateUser(user);
 							System.out.println("Account updated");
 							break;
 						}
 					}
-					break;
 				}
-				
 				ois.close();
 				fis.close();
 			} catch (FileNotFoundException e) {
@@ -211,15 +209,14 @@ public class AccountDaoFile implements AccountDao {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
 		}
-		return accounts.get(pos);
+		return a;
 	}
 
 	public boolean removeAccount(Account a) {
 		// TODO Auto-generated method stub
-		List<Account> accounts;
-		User user = null;
+		List<Account> accounts = new ArrayList<Account>();
+		User user = new User();
 		boolean removed = false;
 		File[] files = new File(fileLocation).listFiles();
 		
