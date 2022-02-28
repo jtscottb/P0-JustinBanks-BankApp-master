@@ -1,6 +1,10 @@
 package com.revature.services;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +24,7 @@ import com.revature.dao.UserDao;
 import com.revature.dao.UserDaoFile;
 import com.revature.driver.BankApplicationDriver;
 import com.revature.exceptions.InvalidCredentialsException;
+import com.revature.exceptions.UsernameAlreadyExistsException;
 
 /**
  * This class should contain the business logic for performing operations on users
@@ -60,6 +65,7 @@ public class UserService {
 		
 		File[] files = new File("Users").listFiles();
 		String doc = null;
+		
 		int nextID = 0;
 		if(files.length == 0) {
 			nextID = 1;
@@ -73,41 +79,71 @@ public class UserService {
 
 		System.out.println("Enter username: ");
 		String username = input.next();
-		newUser.setUsername(username);
-
-		System.out.println("Enter password: ");
-		String password = input.next();
-		newUser.setPassword(password);
-
-		System.out.println("Enter First Name: ");
-		String fname = input.next().toUpperCase();
-		newUser.setFirstName(fname);
-
-		System.out.println("Enter Last Name: ");
-		String lname = input.next().toUpperCase();
-		newUser.setLastName(lname);
-
-		System.out.println("Enter Customer or Employee: ");
-		String userType = input.next().toUpperCase();
-		switch (userType) {
-		case "CUSTOMER":
-			newUser.setUserType(UserType.CUSTOMER);
-			break;
-		case "EMPLOYEE":
-			newUser.setUserType(UserType.EMPLOYEE);
-			break;
-		default:
-			System.out.println("Spelling error!");
-			input.close();
-			break;
+//		Checking if username already exists
+		List<String> ls = new ArrayList<String>();
+		for(File file : files) {
+			try {
+				FileInputStream fileIn = new FileInputStream("Users\\" + file.getName());
+				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+				User user = (User) objectIn.readObject();
+				ls.add(user.getUsername());
+				objectIn.close();
+				fileIn.close();
+			} catch(FileNotFoundException e) {
+				System.out.println("User is not found");
+				e.printStackTrace();
+			} catch(IOException e) {
+				System.out.println("Could not return user");
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				System.out.println("User not found. You must register first");
+				e.printStackTrace();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
-		
-		List<Account> myAccounts = new ArrayList<>();
-		myAccounts = null;
-		newUser.setAccounts(myAccounts);
-		
-//		Write New User to a File
-		UserDaoFile userDaoFile = new UserDaoFile();
-		userDaoFile.addUser(newUser);
+//		Throw exception if username exists
+		if(ls.contains(username)) {
+			System.out.println("Username already taken");
+			throw new UsernameAlreadyExistsException();
+		} else {
+//			Continue program for new username
+			newUser.setUsername(username);
+	
+			System.out.println("Enter password: ");
+			String password = input.next();
+			newUser.setPassword(password);
+	
+			System.out.println("Enter First Name: ");
+			String fname = input.next().toUpperCase();
+			newUser.setFirstName(fname);
+	
+			System.out.println("Enter Last Name: ");
+			String lname = input.next().toUpperCase();
+			newUser.setLastName(lname);
+	
+			System.out.println("Enter Customer or Employee: ");
+			String userType = input.next().toUpperCase();
+			switch (userType) {
+			case "CUSTOMER":
+				newUser.setUserType(UserType.CUSTOMER);
+				break;
+			case "EMPLOYEE":
+				newUser.setUserType(UserType.EMPLOYEE);
+				break;
+			default:
+				System.out.println("Spelling error!");
+				input.close();
+				break;
+			}
+			
+			List<Account> myAccounts = new ArrayList<>();
+			myAccounts = null;
+			newUser.setAccounts(myAccounts);
+			
+	//		Write New User to a File
+			UserDaoFile userDaoFile = new UserDaoFile();
+			userDaoFile.addUser(newUser);
+		}
 	}
 }

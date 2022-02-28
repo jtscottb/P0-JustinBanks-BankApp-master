@@ -36,15 +36,17 @@ public class BankApplicationDriver {
 	public static User Startup() {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Sign in or Register?");
+		User u = null;
 		String action = input.next().toUpperCase();
 		
 		if(action.contains("REG")) {
 			BeginRegistration();
+		} else if(action.contains("SIGN")) {
+			u = SignIn();
 		} else {
-			User u = SignIn();
-			return u;
+			Startup();
 		}
-		return null;
+		return u;
 	}
 	
 	public static void BeginRegistration() {
@@ -82,9 +84,12 @@ public class BankApplicationDriver {
 			//As an employee, I can approve or reject an account.
 			//As an employee, I can view a log of all transactions.
 		}
+		//USER
+			//As a user, I can register with a username and password - 	DONE
+			//As a user, I can login with a username and password - 	DONE
 		//SYSTEM
-			//As the system, I reject registration attempts for usernames that already exist
-			//As the system, I reject login attempts with invalid credentials
+			//As the system, I reject registration attempts for usernames that already exist -	DONE
+			//As the system, I reject login attempts with invalid credentials -					DONE
 			//As the system, I reject and prevent overdrafts
 			//As the system, I reject deposits or withdrawals of negative money
 			//As the system, I reject any transactions of unapproved accounts
