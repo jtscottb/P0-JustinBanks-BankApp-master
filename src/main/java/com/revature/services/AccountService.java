@@ -58,7 +58,7 @@ public class AccountService {
 			action.setAmount(amount);
 			action.setTimestamp();
 			account.setBalance(a.getBalance() - amount);
-			transactions.addAll(a.getTransactions());
+			transactions = a.getTransactions();
 			transactions.add(action);
 			account.setTransactions(transactions);
 			adf.updateAccount(account);
@@ -86,9 +86,9 @@ public class AccountService {
 			action.setAmount(amount);
 			action.setTimestamp();
 			account.setBalance(account.getBalance() + amount);
-			transactions.addAll(account.getTransactions());
+			transactions = account.getTransactions();
 			transactions.add(action);
-//			account.setTransactions(transactions);
+			account.setTransactions(transactions);
 			System.out.println(account);
 			adf.updateAccount(account);
 		}
@@ -113,27 +113,35 @@ public class AccountService {
 		} else if(!toAct.isApproved()) {
 			throw new UnsupportedOperationException("Recipient account is not approved");
 		} else {
-			Transaction sender = new Transaction();
-			sender.setType(TransactionType.TRANSFER);
-			sender.setSender(fromAct);
-			sender.setRecipient(toAct);
-			sender.setAmount(-amount);
-			sender.setTimestamp();
-			fromAct.setBalance(fromAct.getBalance() - amount);
-			fromAct.getTransactions().add(sender);
-			AccountDaoFile adfs = new AccountDaoFile();
-			adfs.updateAccount(fromAct);
+//			SENDER TRANSACTION
+			List<Transaction> transactions = new ArrayList<Transaction>();
+			Transaction t = new Transaction();
+			Account a = new Account();
+			AccountDaoFile adf = new AccountDaoFile();
+			a = adf.getAccount(fromAct.getId());
+			t.setType(TransactionType.TRANSFER);
+			t.setSender(fromAct);
+			t.setRecipient(toAct);
+			t.setAmount(amount);
+			t.setTimestamp();
+			a.setBalance(fromAct.getBalance() - amount);
+			transactions = a.getTransactions();
+			transactions.add(t);
+			a.setTransactions(transactions);
+			adf.updateAccount(a);
 			
-			Transaction receiver = new Transaction();
-			receiver.setType(TransactionType.TRANSFER);
-			receiver.setSender(fromAct);
-			receiver.setRecipient(toAct);
-			receiver.setAmount(amount);
-			receiver.setTimestamp();
-			toAct.setBalance(toAct.getBalance() + amount);
-			toAct.getTransactions().add(receiver);
-			AccountDaoFile adfr = new AccountDaoFile();
-			adfr.updateAccount(fromAct);
+//			RECEIVER TRANSACTION.
+			a = adf.getAccount(toAct.getId());
+			t.setType(TransactionType.TRANSFER);
+			t.setSender(fromAct);
+			t.setRecipient(toAct);
+			t.setAmount(amount);
+			t.setTimestamp();
+			a.setBalance(toAct.getBalance() + amount);
+			transactions = a.getTransactions();
+			transactions.add(t);
+			a.setTransactions(transactions);
+			adf.updateAccount(fromAct);
 		}
 	}
 	
