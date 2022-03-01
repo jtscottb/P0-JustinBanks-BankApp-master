@@ -47,20 +47,21 @@ public class AccountService {
 		} else if(!a.isApproved()) {
 			throw new UnsupportedOperationException("Account not approved");
 		} else {
-			List<Transaction> list = new ArrayList<Transaction>();
+			List<Transaction> transactions = new ArrayList<Transaction>();
 			Transaction action = new Transaction();
+			Account account = new Account();
+			AccountDaoFile adf = new AccountDaoFile();
+			account = adf.getAccount(a.getId());
 			action.setType(TransactionType.WITHDRAWAL);
-			action.setSender(null);
-			action.setRecipient(a);
+			action.setSender(account);
+			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
-			a.setBalance(a.getBalance() - amount);
-			list.addAll(a.getTransactions());
-			list.add(action);
-			
-			a.setTransactions(list);
-			AccountDaoFile adfs = new AccountDaoFile();
-			adfs.updateAccount(a);
+			account.setBalance(a.getBalance() - amount);
+			transactions.addAll(a.getTransactions());
+			transactions.add(action);
+			account.setTransactions(transactions);
+			adf.updateAccount(account);
 		}
 	}
 	
@@ -76,21 +77,20 @@ public class AccountService {
 		} else {
 			List<Transaction> transactions = new ArrayList<Transaction>();
 			Transaction action = new Transaction();
+			Account account = new Account();
+			AccountDaoFile adf = new AccountDaoFile();
+			account = adf.getAccount(a.getId());
 			action.setType(TransactionType.DEPOSIT);
-			action.setSender(a);
+			action.setSender(account);
 			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
-			a.setBalance(a.getBalance() + amount);
-			transactions.addAll(a.getTransactions());
-			
-			System.out.println(transactions.add(action));
-			
-			a.setTransactions(transactions);
-			System.out.println(a);
-
-			AccountDaoFile adf = new AccountDaoFile();
-			adf.updateAccount(a);
+			account.setBalance(account.getBalance() + amount);
+			transactions.addAll(account.getTransactions());
+			transactions.add(action);
+//			account.setTransactions(transactions);
+			System.out.println(account);
+			adf.updateAccount(account);
 		}
 	}
 	

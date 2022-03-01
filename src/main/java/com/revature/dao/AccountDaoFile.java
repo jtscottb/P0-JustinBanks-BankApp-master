@@ -160,19 +160,19 @@ public class AccountDaoFile implements AccountDao {
 				
 				if(a.getOwnerId().equals(user.getId())) {
 					accounts.addAll(user.getAccounts());
+					
 					for(Account i : accounts) {
 						
 						if(i.getId().equals(a.getId())) {
 							pos = accounts.indexOf(i);
 							accounts.remove(pos);
-							System.out.println(accounts.add(a));
-							System.out.println(accounts);
-							
+							accounts.add(pos, a);
 							user.setAccounts(accounts);
-							System.out.println(user);
-							
-							UserDaoFile udf = new UserDaoFile();
-							udf.updateUser(user);
+							FileOutputStream fos = new FileOutputStream(fileLocation + "\\" + file.getName());
+							ObjectOutputStream oos = new ObjectOutputStream(fos);
+							oos.writeObject(user);
+							oos.close();
+							fos.close();
 							System.out.println("Account updated");
 							break;
 						}
@@ -191,7 +191,7 @@ public class AccountDaoFile implements AccountDao {
 				e.printStackTrace();
 			}
 		}
-		return a;
+		return accounts.get(pos);
 	}
 
 	public boolean removeAccount(Account a) {
@@ -212,8 +212,11 @@ public class AccountDaoFile implements AccountDao {
 					accounts = user.getAccounts();
 					removed = accounts.remove(a);
 					user.setAccounts(accounts);
-					UserDaoFile udf = new UserDaoFile();
-					udf.updateUser(user);
+					FileOutputStream fos = new FileOutputStream(fileLocation + "\\" + file.getName());
+					ObjectOutputStream oos = new ObjectOutputStream(fos);
+					oos.writeObject(user);
+					oos.close();
+					fos.close();
 					System.out.println("Account removed");
 					break;
 				}

@@ -72,8 +72,6 @@ public class BankApplicationDriver {
 	}
 	
 	public static void Selection(User user) {
-		Scanner input = new Scanner(System.in);
-		int choice = 0;
 		User customer = new User();
 		customer.setUserType(UserType.CUSTOMER);
 		User employee = new User();
@@ -86,108 +84,12 @@ public class BankApplicationDriver {
 			//As a customer, I can make a withdrawal from a specific account
 			//As a customer, I can post a money transfer to another account.
 			//4
-			System.out.println("What would you like to do?: "
-					+ "\n(1.) Apply for new account (Type: 1)"
-					+ "\n(2.) View balance of my account (Type: 2)"
-					+ "\n(3.) Deposit to an account (Type: 3)"
-					+ "\n(4.) Make a withdrawal (Type: 4)"
-					+ "\n(5.) Transfer money to an account (Type: 5)");
-			
-			choice = input.nextInt();
-			AccountService as = new AccountService(null);
-			AccountDaoFile adf = new AccountDaoFile();
-			List<Account> accounts = adf.getAccountsByUser(user);
-			Account a = new Account();
-			Account a2 = new Account();
-			int num = 0;
-			double amount = 0;
-			
-			switch(choice) {
-			case 1:
-				a = as.createNewAccount(user);
-				a2 = adf.addAccount(a);
-				System.out.println(a2);
-				break;
-				
-			case 2:
-				accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
-				System.out.println("Enter account number: ");
-				num = input.nextInt();
-				a = adf.getAccount(num);
-				System.out.println(a.getBalance());
-				break;
-				
-			case 3:
-				accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
-				System.out.println("Enter account number: ");
-				num = input.nextInt();
-				a = adf.getAccount(num);
-				System.out.println("Enter amount to deposit: ");
-				amount = input.nextDouble();
-				as.deposit(a, amount);
-				System.out.println(a);
-				break;
-				
-			case 4:
-				accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
-				System.out.println("Enter account number: ");
-				num = input.nextInt();
-				a = adf.getAccount(num);
-				System.out.println("Enter amount to withdraw: ");
-				amount = input.nextDouble();
-				as.withdraw(a, amount);
-				System.out.println(a);
-				break;
-				
-			case 5:
-				accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
-				System.out.println("Enter account number to withdraw from: ");
-				num = input.nextInt();
-				a = adf.getAccount(num);
-				System.out.println("Enter account number to deposit into: ");
-				int num2 = input.nextInt();
-				
-				AccountDaoFile adf2 = new AccountDaoFile();
-				a2 = adf2.getAccount(num2);
-				System.out.println("Enter amount to transfer: ");
-				amount = input.nextDouble();
-				
-				as.transfer(a, a2, amount);
-				System.out.println(user.getAccounts());
-				break;
-			}
+			Customer(user);
 		} else if(user.getUserType().equals(employee.getUserType())) {
 			//As an employee, I can approve or reject an account.
 			//As an employee, I can view a log of all transactions.		DONE - 2
 			//2
-			System.out.println("What would you like to do?: "
-				+ "\n(1.) Approve or reject account (Type: 1)"
-				+ "\n(2.) View log of all transactions (Type: 2)");
-			
-			choice = input.nextInt();
-			
-			switch(choice) {
-			case 1:
-				AccountService as = new AccountService(null);
-				AccountDaoFile adf = new AccountDaoFile();
-				int accountID = 0;
-				Account a = new Account();
-				boolean approval = false;
-				System.out.println("Enter account number: ");
-				accountID = input.nextInt();
-				a = adf.getAccount(accountID);
-				System.out.println("Enter \n(1.) Approved \n(2.) Unapproved");
-				approval = (input.nextInt() == 1) ? true : false;
-				as.approveOrRejectAccount(a, approval);
-				break;
-				
-			case 2:
-				TransactionDaoFile tdf = new TransactionDaoFile();
-				List<Transaction> allTransactions = new ArrayList<Transaction>();
-				allTransactions = tdf.getAllTransactions();
-				allTransactions.forEach((a) -> System.out.println(a));
-				break;
-			}
+			Employee(user);
 		}
 		
 		//USER
@@ -201,7 +103,119 @@ public class BankApplicationDriver {
 			//As the system, I reject any transactions of unapproved accounts					DONE - 1
 			//As the system, I reject invalid transfers (negative amounts or overdrafts)		DONE - 1
 		//9
-		Selection(user);
+	}
+	
+	public static void Customer(User user) {
+		Scanner input = new Scanner(System.in);
+		int choice = 0;
+
+		System.out.println("What would you like to do?: "
+				+ "\n(1.) Apply for new account (Type: 1)"
+				+ "\n(2.) View balance of my account (Type: 2)"
+				+ "\n(3.) Deposit to an account (Type: 3)"
+				+ "\n(4.) Make a withdrawal (Type: 4)"
+				+ "\n(5.) Transfer money to an account (Type: 5)");
+		
+		choice = input.nextInt();
+		AccountService as = new AccountService(null);
+		AccountDaoFile adf = new AccountDaoFile();
+		List<Account> accounts = adf.getAccountsByUser(user);
+		Account a = new Account();
+		Account a2 = new Account();
+		int num = 0;
+		double amount = 0;
+		
+		switch(choice) {
+		case 1:
+			a = as.createNewAccount(user);
+			a2 = adf.addAccount(a);
+			System.out.println(a2);
+			break;
+			
+		case 2:
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+			System.out.println("Enter account number: ");
+			num = input.nextInt();
+			a = adf.getAccount(num);
+			System.out.println(a.getBalance());
+			break;
+			
+		case 3:
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+			System.out.println("Enter account number: ");
+			num = input.nextInt();
+			a = adf.getAccount(num);
+			System.out.println("Enter amount to deposit: ");
+			amount = input.nextDouble();
+			as.deposit(a, amount);
+			System.out.println(adf.getAccount(num));
+			break;
+			
+		case 4:
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+			System.out.println("Enter account number: ");
+			num = input.nextInt();
+			a = adf.getAccount(num);
+			System.out.println("Enter amount to withdraw: ");
+			amount = input.nextDouble();
+			as.withdraw(a, amount);
+			System.out.println(adf.getAccount(num));
+			break;
+			
+		case 5:
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+			System.out.println("Enter account number to withdraw from: ");
+			num = input.nextInt();
+			a = adf.getAccount(num);
+			System.out.println("Enter account number to deposit into: ");
+			int num2 = input.nextInt();
+			
+			AccountDaoFile adf2 = new AccountDaoFile();
+			a2 = adf2.getAccount(num2);
+			System.out.println("Enter amount to transfer: ");
+			amount = input.nextDouble();
+			
+			as.transfer(a, a2, amount);
+			System.out.println(user.getAccounts());
+			break;
+			
+		}
+		Customer(user);
+	}
+	
+	public static void Employee(User user) {
+		Scanner input = new Scanner(System.in);
+		int choice = 0;
+		
+		System.out.println("What would you like to do?: "
+				+ "\n(1.) Approve or reject account (Type: 1)"
+				+ "\n(2.) View log of all transactions (Type: 2)");
+			
+		choice = input.nextInt();
+		
+		switch(choice) {
+		case 1:
+			AccountService as = new AccountService(null);
+			AccountDaoFile adf = new AccountDaoFile();
+			int accountID = 0;
+			Account a = new Account();
+			boolean approval = false;
+			System.out.println("Enter account number: ");
+			accountID = input.nextInt();
+			a = adf.getAccount(accountID);
+			System.out.println("Enter \n(1.) Approved \n(2.) Unapproved");
+			approval = (input.nextInt() == 1) ? true : false;
+			as.approveOrRejectAccount(a, approval);
+			break;
+			
+		case 2:
+			TransactionDaoFile tdf = new TransactionDaoFile();
+			List<Transaction> allTransactions = new ArrayList<Transaction>();
+			allTransactions = tdf.getAllTransactions();
+			allTransactions.forEach((account) -> System.out.println(account));
+			break;
+		}
+		Employee(user);
 	}
 	
 	//End of bank driver class
