@@ -163,12 +163,24 @@ public class BankApplicationDriver {
 			System.out.println("What would you like to do?: "
 				+ "\n(1.) Approve or reject account (Type: 1)"
 				+ "\n(2.) View log of all transactions (Type: 2)");
+			
 			choice = input.nextInt();
 			
 			switch(choice) {
 			case 1:
-				
+				AccountService as = new AccountService(null);
+				AccountDaoFile adf = new AccountDaoFile();
+				int accountID = 0;
+				Account a = new Account();
+				boolean approval = false;
+				System.out.println("Enter account number: ");
+				accountID = input.nextInt();
+				a = adf.getAccount(accountID);
+				System.out.println("Enter \n(1.) Approved \n(2.) Unapproved");
+				approval = (input.nextInt() == 1) ? true : false;
+				as.approveOrRejectAccount(a, approval);
 				break;
+				
 			case 2:
 				TransactionDaoFile tdf = new TransactionDaoFile();
 				List<Transaction> allTransactions = new ArrayList<Transaction>();
