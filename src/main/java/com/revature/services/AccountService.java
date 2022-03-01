@@ -74,7 +74,7 @@ public class AccountService {
 		} else if(!a.isApproved()) {
 			throw new UnsupportedOperationException("Account not approved");
 		} else {
-			List<Transaction> list = new ArrayList<Transaction>();
+			List<Transaction> transactions = new ArrayList<Transaction>();
 			Transaction action = new Transaction();
 			action.setType(TransactionType.DEPOSIT);
 			action.setSender(a);
@@ -82,15 +82,15 @@ public class AccountService {
 			action.setAmount(amount);
 			action.setTimestamp();
 			a.setBalance(a.getBalance() + amount);
-			list.addAll(a.getTransactions());
+			transactions.addAll(a.getTransactions());
 			
-			System.out.println(list.add(action));
+			System.out.println(transactions.add(action));
 			
-			a.setTransactions(list);
+			a.setTransactions(transactions);
 			System.out.println(a);
 
-			AccountDaoFile adfs = new AccountDaoFile();
-			adfs.updateAccount(a);
+			AccountDaoFile adf = new AccountDaoFile();
+			adf.updateAccount(a);
 		}
 	}
 	

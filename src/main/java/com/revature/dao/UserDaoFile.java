@@ -164,12 +164,12 @@ public class UserDaoFile implements UserDao {
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File file : files) {
-			String doc = file.getName();
+			int docID = Integer.parseInt(file.getName().split("\\.", 2)[0]);
 			
-			if(u.getId() == Integer.parseInt(doc.split("\\.", 2)[0])) {
+			if(u.getId().equals(docID)) {
 				
 				try {
-					FileOutputStream fileOut = new FileOutputStream(fileLocation + "\\" + doc, false);
+					FileOutputStream fileOut = new FileOutputStream(fileLocation + "\\" + file.getName(), false);
 					ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 					objectOut.writeObject(u);
 					objectOut.close();

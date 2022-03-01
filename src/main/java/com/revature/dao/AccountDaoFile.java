@@ -120,7 +120,7 @@ public class AccountDaoFile implements AccountDao {
 		UserDaoFile udf = new UserDaoFile();
 		users = udf.getAllUsers();
 		for(User u : users) {
-			if(u.getAccounts() == null) {
+			if(u.getAccounts().equals(null)) {
 				users.remove(u);
 			}
 		}
@@ -131,34 +131,15 @@ public class AccountDaoFile implements AccountDao {
 	public List<Account> getAccountsByUser(User u) {
 		// TODO Auto-generated method stub
 		List<Account> accounts = new ArrayList<Account>();
-		File[] files = new File(fileLocation).listFiles();
+		List<User> users = new ArrayList<User>();
+		UserDaoFile udf = new UserDaoFile();
+		users = udf.getAllUsers();
 		
-		for(File file : files) {
-			
-			int docID = Integer.parseInt(file.getName().split("\\.", 2)[0]);
-			if(u.getId() == docID) {
-				
-				try {
-					FileInputStream fis = new FileInputStream(fileLocation + "\\" + file.getName());
-					ObjectInputStream ois = new ObjectInputStream(fis);
-					User user = (User) ois.readObject();
-					accounts = user.getAccounts();
-					ois.close();
-					fis.close();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+		for(User user : users) {
+			if(u.getId().equals(user.getId())) {
+				accounts.addAll(user.getAccounts());
 				break;
 			}
-			
 		}
 		return accounts;
 	}
@@ -227,7 +208,7 @@ public class AccountDaoFile implements AccountDao {
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				user = (User) ois.readObject();
 				
-				if(a.getOwnerId() == user.getId()) {
+				if(a.getOwnerId().equals(user.getId())) {
 					accounts = user.getAccounts();
 					removed = accounts.remove(a);
 					user.setAccounts(accounts);

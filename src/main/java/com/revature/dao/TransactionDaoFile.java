@@ -20,19 +20,19 @@ public class TransactionDaoFile implements TransactionDao {
 
 	public List<Transaction> getAllTransactions() {
 		// TODO Auto-generated method stub
-		List<Transaction> tList = new ArrayList<Transaction>();
-		List<Account> aList = new ArrayList<Account>();
+		List<Transaction> transactions = new ArrayList<Transaction>();
+		List<Account> accounts = new ArrayList<Account>();
 		AccountDaoFile adf = new AccountDaoFile();
-		aList = adf.getAccounts();
-		for(Account a : aList) {
-			if(a.getTransactions() == null) {
-				aList.remove(a);
+		accounts = adf.getAccounts();
+		for(Account a : accounts) {
+			if(a.getTransactions().equals(null)) {
+				accounts.remove(a);
 			}
 		}
-		aList.forEach((a) -> tList.addAll(a.getTransactions()));
+		accounts.forEach((a) -> transactions.addAll(a.getTransactions()));
 		
-		tList.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
-		return tList;
+		transactions.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
+		return transactions;
 	}
 
 }

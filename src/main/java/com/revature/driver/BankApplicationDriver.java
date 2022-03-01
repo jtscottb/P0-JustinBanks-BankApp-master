@@ -45,7 +45,7 @@ public class BankApplicationDriver {
 		} else if(action.contains("SIGN")) {
 			u = SignIn();
 		} else {
-			Startup();
+			u = Startup();
 		}
 		return u;
 	}
@@ -96,18 +96,21 @@ public class BankApplicationDriver {
 			choice = input.nextInt();
 			AccountService as = new AccountService(null);
 			AccountDaoFile adf = new AccountDaoFile();
+			List<Account> accounts = adf.getAccountsByUser(user);
 			Account a = new Account();
+			Account a2 = new Account();
 			int num = 0;
 			double amount = 0;
 			
 			switch(choice) {
 			case 1:
 				a = as.createNewAccount(user);
-				adf.addAccount(a);
-				System.out.println(user);
+				a2 = adf.addAccount(a);
+				System.out.println(a2);
 				break;
 				
 			case 2:
+				accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
 				System.out.println("Enter account number: ");
 				num = input.nextInt();
 				a = adf.getAccount(num);
@@ -115,6 +118,7 @@ public class BankApplicationDriver {
 				break;
 				
 			case 3:
+				accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
 				System.out.println("Enter account number: ");
 				num = input.nextInt();
 				a = adf.getAccount(num);
@@ -125,6 +129,7 @@ public class BankApplicationDriver {
 				break;
 				
 			case 4:
+				accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
 				System.out.println("Enter account number: ");
 				num = input.nextInt();
 				a = adf.getAccount(num);
@@ -135,18 +140,20 @@ public class BankApplicationDriver {
 				break;
 				
 			case 5:
+				accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
 				System.out.println("Enter account number to withdraw from: ");
 				num = input.nextInt();
 				a = adf.getAccount(num);
 				System.out.println("Enter account number to deposit into: ");
 				int num2 = input.nextInt();
+				
 				AccountDaoFile adf2 = new AccountDaoFile();
-				Account a2 = null;
 				a2 = adf2.getAccount(num2);
 				System.out.println("Enter amount to transfer: ");
 				amount = input.nextDouble();
+				
 				as.transfer(a, a2, amount);
-				System.out.println(a);
+				System.out.println(user.getAccounts());
 				break;
 			}
 		} else if(user.getUserType().equals(employee.getUserType())) {
@@ -163,9 +170,10 @@ public class BankApplicationDriver {
 				
 				break;
 			case 2:
-				List<Transaction> allTrans = new ArrayList<Transaction>();
-				allTrans = SeeAllTransactions();
-				allTrans.forEach((a) -> System.out.println(a));
+				TransactionDaoFile tdf = new TransactionDaoFile();
+				List<Transaction> allTransactions = new ArrayList<Transaction>();
+				allTransactions = tdf.getAllTransactions();
+				allTransactions.forEach((a) -> System.out.println(a));
 				break;
 			}
 		}
@@ -182,27 +190,6 @@ public class BankApplicationDriver {
 			//As the system, I reject invalid transfers (negative amounts or overdrafts)		DONE - 1
 		//9
 		Selection(user);
-	}
-
-	public static List<Transaction> SeeAllTransactions() {
-		List<Transaction> trans = new ArrayList<Transaction>();
-		TransactionDaoFile tdf = new TransactionDaoFile();
-		trans = tdf.getAllTransactions();
-		return trans;
-	}
-	
-	public static Account NewAccount(User user) {
-		Account a;
-		AccountService as = new AccountService(null);
-		a = as.createNewAccount(user);
-		return a;
-	}
-	
-	public static List<Account> MyAccounts(User user) {
-		List<Account> myAccounts;
-		AccountDaoFile adf = new AccountDaoFile();
-		myAccounts = adf.getAccountsByUser(user);
-		return myAccounts;
 	}
 	
 	//End of bank driver class
