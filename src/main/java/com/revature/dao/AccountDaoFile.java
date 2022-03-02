@@ -137,7 +137,7 @@ public class AccountDaoFile implements AccountDao {
 		
 		for(User user : users) {
 			if(u.getId().equals(user.getId())) {
-				accounts.addAll(user.getAccounts());
+				accounts = user.getAccounts();
 				break;
 			}
 		}

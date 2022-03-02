@@ -57,11 +57,11 @@ public class AccountService {
 			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
-			account.setBalance(a.getBalance() - amount);
+			a.setBalance(a.getBalance() - amount);
 			transactions = a.getTransactions();
 			transactions.add(action);
-			account.setTransactions(transactions);
-			adf.updateAccount(account);
+			a.setTransactions(transactions);
+			adf.updateAccount(a);
 		}
 	}
 	
@@ -85,12 +85,11 @@ public class AccountService {
 			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
-			account.setBalance(account.getBalance() + amount);
-			transactions = account.getTransactions();
+			a.setBalance(a.getBalance() + amount);
+			transactions = a.getTransactions();
 			transactions.add(action);
-			account.setTransactions(transactions);
-			System.out.println(account);
-			adf.updateAccount(account);
+			a.setTransactions(transactions);
+			adf.updateAccount(a);
 		}
 	}
 	
@@ -120,27 +119,27 @@ public class AccountService {
 			AccountDaoFile adf = new AccountDaoFile();
 			a = adf.getAccount(fromAct.getId());
 			t.setType(TransactionType.TRANSFER);
-			t.setSender(fromAct);
+			t.setSender(a);
 			t.setRecipient(toAct);
 			t.setAmount(amount);
 			t.setTimestamp();
-			a.setBalance(fromAct.getBalance() - amount);
-			transactions = a.getTransactions();
+			fromAct.setBalance(fromAct.getBalance() - amount);
+			transactions = fromAct.getTransactions();
 			transactions.add(t);
-			a.setTransactions(transactions);
+			fromAct.setTransactions(transactions);
 			adf.updateAccount(a);
 			
 //			RECEIVER TRANSACTION.
 			a = adf.getAccount(toAct.getId());
 			t.setType(TransactionType.TRANSFER);
 			t.setSender(fromAct);
-			t.setRecipient(toAct);
+			t.setRecipient(a);
 			t.setAmount(amount);
 			t.setTimestamp();
-			a.setBalance(toAct.getBalance() + amount);
-			transactions = a.getTransactions();
+			toAct.setBalance(toAct.getBalance() + amount);
+			transactions = toAct.getTransactions();
 			transactions.add(t);
-			a.setTransactions(transactions);
+			toAct.setTransactions(transactions);
 			adf.updateAccount(fromAct);
 		}
 	}

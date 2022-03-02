@@ -80,10 +80,10 @@ public class BankApplicationDriver {
 		if(user.getUserType().equals(customer.getUserType())) {
 			//As a customer, I can apply for a new bank account with a starting balance		DONE - 3
 			//As a customer, I can view the balance of a specific account					DONE - 1 
-			//As a customer, I can make a deposit to a specific account
-			//As a customer, I can make a withdrawal from a specific account
+			//As a customer, I can make a deposit to a specific account						DONE - 2
+			//As a customer, I can make a withdrawal from a specific account				DONE - 2
 			//As a customer, I can post a money transfer to another account.
-			//4
+			//8
 			Customer(user);
 		} else if(user.getUserType().equals(employee.getUserType())) {
 			//As an employee, I can approve or reject an account.
@@ -176,7 +176,7 @@ public class BankApplicationDriver {
 			amount = input.nextDouble();
 			
 			as.transfer(a, a2, amount);
-			System.out.println(user.getAccounts());
+			System.out.println(adf.getAccount(a.getId()) + "\n" + adf.getAccount(a2.getId()));
 			break;
 			
 		}
