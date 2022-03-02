@@ -36,15 +36,17 @@ public class BankApplicationDriver {
 	
 	public static User Startup() {
 		Scanner input = new Scanner(System.in);
-		System.out.println("Sign in or Register?");
+		System.out.println("(1.) Sign in \n(2.) Register?");
 		User u = null;
-		String action = input.next().toUpperCase();
+		int action = input.nextInt();
 		
-		if(action.contains("REG")) {
+		switch(action) {
+		case 1:
 			BeginRegistration();
-		} else if(action.contains("SIGN")) {
+		case 2:
 			u = SignIn();
-		} else {
+		default:
+			System.out.println("Enter 1 or 2");
 			u = Startup();
 		}
 		return u;

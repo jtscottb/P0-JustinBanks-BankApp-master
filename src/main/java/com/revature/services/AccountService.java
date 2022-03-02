@@ -210,9 +210,9 @@ public class AccountService {
 		account.setOwnerId(u.getId());
 		account.setBalance(STARTING_BALANCE);
 		
-		System.out.println("Account approved (Yes/No): ");
-		String approve = input.next().toUpperCase();
-		boolean b = (approve.matches("YES")) ? true : false;
+		System.out.println("Account approved? \n(1.) Yes \n(2.) No)");
+		int approve = input.nextInt();
+		boolean b = (approve == 1) ? true : false;
 		account.setApproved(b);
 		
 		List<Transaction> myTransactions = new ArrayList<>();

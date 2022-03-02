@@ -80,13 +80,13 @@ public class UserService {
 		System.out.println("Enter username: ");
 		String username = input.next();
 //		Checking if username already exists
-		List<String> ls = new ArrayList<String>();
+		List<String> usernameList = new ArrayList<String>();
 		for(File file : files) {
 			try {
 				FileInputStream fileIn = new FileInputStream("Users\\" + file.getName());
 				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
 				User user = (User) objectIn.readObject();
-				ls.add(user.getUsername());
+				usernameList.add(user.getUsername());
 				objectIn.close();
 				fileIn.close();
 			} catch(FileNotFoundException e) {
@@ -103,7 +103,7 @@ public class UserService {
 			}
 		}
 //		Throw exception if username exists
-		if(ls.contains(username)) {
+		if(usernameList.contains(username)) {
 			System.out.println("Username already taken");
 			throw new UsernameAlreadyExistsException();
 		} else {
@@ -122,13 +122,13 @@ public class UserService {
 			String lname = input.next().toUpperCase();
 			newUser.setLastName(lname);
 	
-			System.out.println("Enter Customer or Employee: ");
-			String userType = input.next().toUpperCase();
+			System.out.println("(1.) Customer or \n(2.) Employee");
+			int userType = input.nextInt();
 			switch (userType) {
-			case "CUSTOMER":
+			case 1:
 				newUser.setUserType(UserType.CUSTOMER);
 				break;
-			case "EMPLOYEE":
+			case 2:
 				newUser.setUserType(UserType.EMPLOYEE);
 				break;
 			default:
