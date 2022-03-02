@@ -66,10 +66,12 @@ public class BankApplicationDriver {
 		String username = input.next();
 		System.out.println("Enter password: ");
 		String password = input.next();
+//		CHECK CREDENTIALS
 		User u = us.login(username, password);
 		
 //		STORE WHO'S LOGGED ON
 		SessionCache.setCurrentUser(u);
+//		RETURN LOGGED IN USER
 		return u;
 	}
 	
@@ -118,6 +120,7 @@ public class BankApplicationDriver {
 				+ "\n(4.) Make a withdrawal"
 				+ "\n(5.) Transfer money to an account");
 		
+//		CHOICE SETUP
 		choice = input.nextInt();
 		AccountService as = new AccountService(null);
 		AccountDaoFile adf = new AccountDaoFile();
@@ -135,48 +138,64 @@ public class BankApplicationDriver {
 			break;
 			
 		case 2:
+//			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+//			SELECT ACCOUNT TO VIEW BALANCE
 			System.out.println("Enter account number: ");
 			num = input.nextInt();
+//			COPY ACCOUNT AND PRINT BALANCE
 			a = adf.getAccount(num);
 			System.out.println(a.getBalance());
 			break;
 			
 		case 3:
+//			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+//			CHOOSE ACCOUNT TO DEPOSIT AND COPY ACCOUNT
 			System.out.println("Enter account number: ");
 			num = input.nextInt();
 			a = adf.getAccount(num);
+//			ENTER AMOUNT TO DEPOSIT
 			System.out.println("Enter amount to deposit: ");
 			amount = input.nextDouble();
+//			DEPOSIT AMOUNT AND PRINT UPDATED ACCOUNT
 			as.deposit(a, amount);
 			System.out.println(adf.getAccount(num));
 			break;
 			
 		case 4:
+//			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+//			CHOOSE ACCOUNT TO WITHDRAW AND COPY ACCOUNT
 			System.out.println("Enter account number: ");
 			num = input.nextInt();
 			a = adf.getAccount(num);
+//			ENTER AMOUNT TO WITHDRAW
 			System.out.println("Enter amount to withdraw: ");
 			amount = input.nextDouble();
+//			WITHDRAW AMOUNT AND PRINT UPDATED ACCOUNT
 			as.withdraw(a, amount);
 			System.out.println(adf.getAccount(num));
 			break;
 			
 		case 5:
+//			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+//			CHOOSE WHICH ACCOUNT TO WITHDRAW FROM
 			System.out.println("Enter account number to withdraw from: ");
 			num = input.nextInt();
+//			COPY WITHDRAW ACCOUNT
 			a = adf.getAccount(num);
+//			CHOOSE WHICH ACCOUNT TO DEPOSIT INTO
 			System.out.println("Enter account number to deposit into: ");
 			int num2 = input.nextInt();
-			
+//			COPY DEPOSIT ACCOUNT
 			AccountDaoFile adf2 = new AccountDaoFile();
 			a2 = adf2.getAccount(num2);
+//			SET TRANSFER AMOUNT
 			System.out.println("Enter amount to transfer: ");
 			amount = input.nextDouble();
-			
+//			TRANSFER AMOUNT AND PRINT BOTH UPDATED ACCOUNTS
 			as.transfer(a, a2, amount);
 			System.out.println(adf.getAccount(a.getId()) + "\n" + adf.getAccount(a2.getId()));
 			break;
@@ -190,30 +209,40 @@ public class BankApplicationDriver {
 		int choice = 0;
 		
 		System.out.println("What would you like to do?: "
-				+ "\n(1.) Approve or reject account (Type: 1)"
-				+ "\n(2.) View log of all transactions (Type: 2)");
+				+ "\n(1.) Approve or reject an account"
+				+ "\n(2.) View log of all transactions");
 			
 		choice = input.nextInt();
 		
 		switch(choice) {
 		case 1:
+//			SETUP
+			List<Account> accounts = new ArrayList<Account>();
 			AccountService as = new AccountService(null);
 			AccountDaoFile adf = new AccountDaoFile();
 			int accountID = 0;
 			Account a = new Account();
 			boolean approval = false;
+//			GET AND PRINT LIST OF ALL ACCOUNTS
+			accounts = adf.getAccounts();
+			accounts.forEach(account -> System.out.println(account));
+//			CHOOSE AND COPY SELECTED ACCOUNT
 			System.out.println("Enter account number: ");
 			accountID = input.nextInt();
 			a = adf.getAccount(accountID);
+//			CHANGE APPROVAL STATUS
 			System.out.println("Enter \n(1.) Approved \n(2.) Unapproved");
 			approval = (input.nextInt() == 1) ? true : false;
 			as.approveOrRejectAccount(a, approval);
 			break;
 			
 		case 2:
+//			SETUP
 			TransactionDaoFile tdf = new TransactionDaoFile();
 			List<Transaction> allTransactions = new ArrayList<Transaction>();
+//			GET LIST OF ALL TRANSACTIONS BY ALL USERS
 			allTransactions = tdf.getAllTransactions();
+//			PRINT ALL TRANSACTIONS
 			allTransactions.forEach((account) -> System.out.println(account));
 			break;
 		}

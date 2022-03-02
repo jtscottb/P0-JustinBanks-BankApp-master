@@ -47,20 +47,27 @@ public class AccountService {
 		} else if(!a.isApproved()) {
 			throw new UnsupportedOperationException("Account not approved");
 		} else {
+//			SETUP
 			List<Transaction> transactions = new ArrayList<Transaction>();
 			Transaction action = new Transaction();
 			Account account = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
+//			COPY ACCOUNT FROM USER FILE
 			account = adf.getAccount(a.getId());
+//			CREATE TRANSACTION DETAILS
 			action.setType(TransactionType.WITHDRAWAL);
 			action.setSender(account);
 			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
+//			ADJUST ACCOUNT BALANCE
 			a.setBalance(a.getBalance() - amount);
+//			COPY EXISTING TRANSACTIONS
 			transactions = a.getTransactions();
+//			ADD NEW TRANSACTION AND SET NEW TRANSACTION LIST TO ACCOUNT
 			transactions.add(action);
 			a.setTransactions(transactions);
+//			UPDATE USER FILE WITH UPDATED ACCOUNT
 			adf.updateAccount(a);
 		}
 	}
@@ -75,19 +82,25 @@ public class AccountService {
 		} else if(!a.isApproved()) {
 			throw new UnsupportedOperationException("Account not approved");
 		} else {
+//			SETUP
 			List<Transaction> transactions = new ArrayList<Transaction>();
 			Transaction action = new Transaction();
 			Account account = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
+//			COPY ACCOUNT
 			account = adf.getAccount(a.getId());
+//			CREATE TRANSACTION DETAILS
 			action.setType(TransactionType.DEPOSIT);
 			action.setSender(account);
 			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
+//			UPDATE ACCOUNT BALANCE
 			a.setBalance(a.getBalance() + amount);
+//			COPY EXISTING TRANSACTIONS AND ADD NEW TRANSACTION TO LIST
 			transactions = a.getTransactions();
 			transactions.add(action);
+//			SET NEW TRANSACTION TO TRANSACTION LIST IN ACCOUNT AND UPDATE USER FILE
 			a.setTransactions(transactions);
 			adf.updateAccount(a);
 		}
@@ -117,30 +130,44 @@ public class AccountService {
 			Transaction t = new Transaction();
 			Account a = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
+//			COPY ACCOUNT
 			a = adf.getAccount(fromAct.getId());
+//			SETUP NEW TRANSACTION DETAILS
 			t.setType(TransactionType.TRANSFER);
 			t.setSender(a);
 			t.setRecipient(toAct);
 			t.setAmount(amount);
 			t.setTimestamp();
+//			UPDATE ACCOUNT BALANCE
 			fromAct.setBalance(fromAct.getBalance() - amount);
+//			COPY TRANSACTIONS FROM ACCOUNT AND ADD NEW TRANSACTION
 			transactions = fromAct.getTransactions();
 			transactions.add(t);
+//			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
 			fromAct.setTransactions(transactions);
 			adf.updateAccount(a);
 			
 //			RECEIVER TRANSACTION.
-			a = adf.getAccount(toAct.getId());
-			t.setType(TransactionType.TRANSFER);
-			t.setSender(fromAct);
-			t.setRecipient(a);
-			t.setAmount(amount);
-			t.setTimestamp();
+			List<Transaction> receiverTransactions = new ArrayList<Transaction>();
+			Transaction tr = new Transaction();
+			Account ar = new Account();
+			AccountDaoFile adfr = new AccountDaoFile();
+//			COPY ACCOUNT
+			ar = adfr.getAccount(toAct.getId());
+//			SETUP NEW TRANSACTION DETAILS
+			tr.setType(TransactionType.TRANSFER);
+			tr.setSender(fromAct);
+			tr.setRecipient(ar);
+			tr.setAmount(amount);
+			tr.setTimestamp();
+//			UPDATE ACCOUNT BALANCE
 			toAct.setBalance(toAct.getBalance() + amount);
-			transactions = toAct.getTransactions();
-			transactions.add(t);
-			toAct.setTransactions(transactions);
-			adf.updateAccount(fromAct);
+//			COPY TRANSACTIONS FROM ACCOUNT AND ADD NEW TRANSACTION
+			receiverTransactions = toAct.getTransactions();
+			receiverTransactions.add(tr);
+//			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
+			toAct.setTransactions(receiverTransactions);
+			adfr.updateAccount(fromAct);
 		}
 	}
 	
@@ -151,7 +178,7 @@ public class AccountService {
 	public Account createNewAccount(User u) {
 		Account account = new Account();
 		Scanner input = new Scanner(System.in);
-		
+//		CHOOSE ACCOUNT TYPE
 		System.out.println("Enter \n(1.) Checking or \n(2.) Savings");
 		int accountType = input.nextInt();
 		switch(accountType) {
@@ -165,8 +192,7 @@ public class AccountService {
 			System.out.println("Enter 1 for Checking or 2 for Savings");
 			input.close();
 		}
-		
-		//code to find the next available account number
+//		FIND NEXT AVAILABLE ACCOUNT NUMBER
 		int accountID = 0;
 		User user = new User();
 		File[] files = new File("Users").listFiles();
@@ -204,24 +230,24 @@ public class AccountService {
 				e.printStackTrace();
 			}
 		}
+//		SET NEXT ACCOUNT NUMBER TO ID
 		account.setId(accountID + 1);
-		//end account number code
-		
+//		LINK ACCOUNT WITH USER ID
 		account.setOwnerId(u.getId());
 		account.setBalance(STARTING_BALANCE);
-		
+//		SET APPROVAL
 		System.out.println("Account approved? \n(1.) Yes \n(2.) No)");
 		int approve = input.nextInt();
 		boolean b = (approve == 1) ? true : false;
 		account.setApproved(b);
-		
+//		GENERATE TRANSACTION DETAIL FOR STARTING BALANCE
 		List<Transaction> myTransactions = new ArrayList<>();
 		Transaction t = new Transaction();
 		t.setAmount(STARTING_BALANCE);
 		t.setTimestamp();
 		t.setType(TransactionType.DEPOSIT);
 		myTransactions.add(t);
-		
+//		SET TRANSACTION TO ACCOUNT
 		account.setTransactions(myTransactions);
 		System.out.println("Account created");
 		

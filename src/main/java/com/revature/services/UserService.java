@@ -49,7 +49,6 @@ public class UserService {
 		User user = (User) udf.getUser(username, password);
 		if(user == null) {
 			System.out.println("Incorrect username or password");
-//			BankApplicationDriver.SignIn();
 			throw new InvalidCredentialsException();
 		}
 		return user;
@@ -65,7 +64,7 @@ public class UserService {
 		
 		File[] files = new File("Users").listFiles();
 		String doc = null;
-		
+//		FIND NEXT AVAILABLE USER ID NUMBER FROM TEXT FILE NAMES
 		int nextID = 0;
 		if(files.length == 0) {
 			nextID = 1;
@@ -73,13 +72,15 @@ public class UserService {
 			for(File f : files) {
 				doc = f.getName();
 			}
+//			CONVERT FILE NAME FROM STRING TO INTEGER, SPLIT BY '.'
 			nextID = Integer.parseInt(doc.split("\\.", 2)[0]) + 1;
 		}
+//		ASSIGN NEXT ID NUMBER TO NEW USER
 		newUser.setId(nextID);
-
+//		SELECT USERNAME
 		System.out.println("Enter username: ");
 		String username = input.next();
-//		Checking if username already exists
+//		CHECK TO SEE IF ANOTHER USER HAS USERNAME
 		List<String> usernameList = new ArrayList<String>();
 		for(File file : files) {
 			try {
@@ -102,26 +103,26 @@ public class UserService {
 				e.printStackTrace();
 			}
 		}
-//		Throw exception if username exists
+//		THROW EXCEPTION IF USERNAME EXISTS
 		if(usernameList.contains(username)) {
 			System.out.println("Username already taken");
 			throw new UsernameAlreadyExistsException();
 		} else {
-//			Continue program for new username
+//			SET USERNAME FOR NON EXISTING USERNAME
 			newUser.setUsername(username);
-	
+//			CHOOSE PASSWORD
 			System.out.println("Enter password: ");
 			String password = input.next();
 			newUser.setPassword(password);
-	
+//			ENTER FIRST NAME
 			System.out.println("Enter First Name: ");
 			String fname = input.next().toUpperCase();
 			newUser.setFirstName(fname);
-	
+//			ENTER LAST NAME
 			System.out.println("Enter Last Name: ");
 			String lname = input.next().toUpperCase();
 			newUser.setLastName(lname);
-	
+//			CHOOSE USER TYPE
 			System.out.println("(1.) Customer or \n(2.) Employee");
 			int userType = input.nextInt();
 			switch (userType) {
@@ -136,12 +137,11 @@ public class UserService {
 				input.close();
 				break;
 			}
-			
+//			SET ACCOUNT LIST TO NULL BY DEFAULT
 			List<Account> myAccounts = new ArrayList<>();
 			myAccounts = null;
 			newUser.setAccounts(myAccounts);
-			
-	//		Write New User to a File
+	//		CREATE NEW USER FILE
 			UserDaoFile userDaoFile = new UserDaoFile();
 			userDaoFile.addUser(newUser);
 		}
