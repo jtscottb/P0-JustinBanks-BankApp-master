@@ -112,11 +112,11 @@ public class BankApplicationDriver {
 		int choice = 0;
 
 		System.out.println("What would you like to do?: "
-				+ "\n(1.) Apply for new account (Type: 1)"
-				+ "\n(2.) View balance of my account (Type: 2)"
-				+ "\n(3.) Deposit to an account (Type: 3)"
-				+ "\n(4.) Make a withdrawal (Type: 4)"
-				+ "\n(5.) Transfer money to an account (Type: 5)");
+				+ "\n(1.) Apply for new account"
+				+ "\n(2.) View balance of my account"
+				+ "\n(3.) Deposit to an account"
+				+ "\n(4.) Make a withdrawal"
+				+ "\n(5.) Transfer money to an account");
 		
 		choice = input.nextInt();
 		AccountService as = new AccountService(null);
