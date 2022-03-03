@@ -56,8 +56,56 @@ public class BankApplicationDriver {
 	}
 	
 	public static void BeginRegistration() {
-		UserService us = new UserService(null, null);
+		Scanner input = new Scanner(System.in);
+		List<User> users = new ArrayList<User>();
+		UserDao udf = new UserDaoFile();
+		AccountDao adf = new AccountDaoFile();
 		User newUser = new User();
+		users = udf.getAllUsers();
+//		FIND NEXT AVAILABLE USER ID NUMBER FROM USER LIST
+		int nextID = 0;
+		for(User u : users) {
+			if(users.isEmpty()) {
+				nextID = 1;
+			} else {
+				nextID = (u.getId() > nextID) ? u.getId() : nextID;
+			}
+		}
+//		ASSIGN NEXT ID NUMBER TO NEW USER
+		newUser.setId(nextID + 1);
+//		SELECT USERNAME
+		System.out.println("Enter username: ");
+		String username = input.next();
+		newUser.setUsername(username);
+//		CHOOSE PASSWORD
+		System.out.println("Enter password: ");
+		String password = input.next();
+		newUser.setPassword(password);
+//		ENTER FIRST NAME
+		System.out.println("Enter First Name: ");
+		String fname = input.next().toUpperCase();
+		newUser.setFirstName(fname);
+//		ENTER LAST NAME
+		System.out.println("Enter Last Name: ");
+		String lname = input.next().toUpperCase();
+		newUser.setLastName(lname);
+//		CHOOSE USER TYPE
+		System.out.println("(1.) Customer or \n(2.) Employee");
+		int userType = input.nextInt();
+		switch (userType) {
+		case 1:
+			newUser.setUserType(UserType.CUSTOMER);
+			break;
+		case 2:
+			newUser.setUserType(UserType.EMPLOYEE);
+			break;
+		default:
+			BeginRegistration();
+			break;
+		}
+		newUser.setAccounts(new ArrayList<Account>());
+		
+		UserService us = new UserService(udf, adf);
 		us.register(newUser);
 	}
 	
@@ -125,22 +173,35 @@ public class BankApplicationDriver {
 		
 //		CHOICE SETUP
 		choice = input.nextInt();
-		AccountService as = new AccountService(null);
-		AccountDaoFile adf = new AccountDaoFile();
+		AccountDao adf = new AccountDaoFile();
+		AccountService as = new AccountService(adf);
 		List<Account> accounts = adf.getAccountsByUser(user);
+		User u = user;
 		Account a = new Account();
 		Account a2 = new Account();
 		int num = 0;
 		double amount = 0;
 		
 		switch(choice) {
-		case 1:
+		case 1:	//Apply for new account
 			a = as.createNewAccount(user);
-			a2 = adf.addAccount(a);
+			a = adf.getAccount(a.getId());
+//			CHOOSE ACCOUNT TYPE
+			System.out.println("Enter \n(1.) Checking or \n(2.) Savings");
+			int accountType = input.nextInt();
+			switch(accountType) {
+			case 1:
+				a.setType(AccountType.CHECKING);
+				break;
+			case 2:
+				a.setType(AccountType.SAVINGS);
+				break;
+			}
+			a2 = adf.updateAccount(a);
 			System.out.println(a2);
 			break;
 			
-		case 2:
+		case 2:	//View balance of my account
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
 //			SELECT ACCOUNT TO VIEW BALANCE
@@ -151,7 +212,7 @@ public class BankApplicationDriver {
 			System.out.println(a.getBalance());
 			break;
 			
-		case 3:
+		case 3:	//Deposit to an account
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
 //			CHOOSE ACCOUNT TO DEPOSIT AND COPY ACCOUNT
@@ -166,7 +227,7 @@ public class BankApplicationDriver {
 			System.out.println(adf.getAccount(num));
 			break;
 			
-		case 4:
+		case 4:	//Make a withdrawal
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
 //			CHOOSE ACCOUNT TO WITHDRAW AND COPY ACCOUNT
@@ -181,7 +242,7 @@ public class BankApplicationDriver {
 			System.out.println(adf.getAccount(num));
 			break;
 			
-		case 5:
+		case 5:	//Transfer money to an account
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
 //			CHOOSE WHICH ACCOUNT TO WITHDRAW FROM
@@ -207,6 +268,16 @@ public class BankApplicationDriver {
 		Customer(user);
 	}
 	
+	public static Account StartNewAccount(User user) {
+		Scanner input = new Scanner(System.in);
+		Account account = new Account();
+		AccountDao adf = new AccountDaoFile();
+		AccountService as = new AccountService(adf);
+
+		
+		return account;
+	}
+
 	public static void Employee(User user) {
 		Scanner input = new Scanner(System.in);
 		int choice = 0;

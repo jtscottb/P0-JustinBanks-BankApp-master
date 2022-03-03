@@ -18,6 +18,7 @@ import com.revature.beans.Account.AccountType;
 import com.revature.beans.Transaction.TransactionType;
 import com.revature.dao.AccountDao;
 import com.revature.dao.AccountDaoFile;
+import com.revature.driver.BankApplicationDriver;
 import com.revature.exceptions.OverdraftException;
 import com.revature.utils.SessionCache;
 
@@ -100,8 +101,9 @@ public class AccountService {
 //			COPY EXISTING TRANSACTIONS AND ADD NEW TRANSACTION TO LIST
 			transactions = a.getTransactions();
 			transactions.add(action);
-//			SET NEW TRANSACTION TO TRANSACTION LIST IN ACCOUNT AND UPDATE USER FILE
+//			SET NEW TRANSACTION TO TRANSACTION LIST IN ACCOUNT
 			a.setTransactions(transactions);
+//			UPDATE USER FILE WITH UPDATED ACCOUNT
 			adf.updateAccount(a);
 		}
 	}
@@ -142,10 +144,9 @@ public class AccountService {
 			fromAct.setBalance(fromAct.getBalance() - amount);
 //			COPY TRANSACTIONS FROM ACCOUNT AND ADD NEW TRANSACTION
 			transactions = fromAct.getTransactions();
-			transactions.add(t);
 //			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
 			fromAct.setTransactions(transactions);
-			adf.updateAccount(a);
+			adf.updateAccount(fromAct);
 			
 //			RECEIVER TRANSACTION.
 			List<Transaction> receiverTransactions = new ArrayList<Transaction>();
@@ -153,7 +154,7 @@ public class AccountService {
 			Account ar = new Account();
 			AccountDaoFile adfr = new AccountDaoFile();
 //			COPY ACCOUNT
-			ar = adfr.getAccount(toAct.getId());
+			ar = adf.getAccount(fromAct.getId());
 //			SETUP NEW TRANSACTION DETAILS
 			tr.setType(TransactionType.TRANSFER);
 			tr.setSender(fromAct);
@@ -164,10 +165,9 @@ public class AccountService {
 			toAct.setBalance(toAct.getBalance() + amount);
 //			COPY TRANSACTIONS FROM ACCOUNT AND ADD NEW TRANSACTION
 			receiverTransactions = toAct.getTransactions();
-			receiverTransactions.add(tr);
 //			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
 			toAct.setTransactions(receiverTransactions);
-			adfr.updateAccount(fromAct);
+			adf.updateAccount(toAct);
 		}
 	}
 	
@@ -176,79 +176,35 @@ public class AccountService {
 	 * @return the Account object that was created
 	 */
 	public Account createNewAccount(User u) {
+		List<Transaction> myTransactions = new ArrayList<>();
+		List<Account> accounts = new ArrayList<Account>();
+		AccountDaoFile adf = new AccountDaoFile();
+		Transaction t = new Transaction();
 		Account account = new Account();
-		Scanner input = new Scanner(System.in);
-//		CHOOSE ACCOUNT TYPE
-		System.out.println("Enter \n(1.) Checking or \n(2.) Savings");
-		int accountType = input.nextInt();
-		switch(accountType) {
-		case 1:
-			account.setType(AccountType.CHECKING);
-			break;
-		case 2:
-			account.setType(AccountType.SAVINGS);
-			break;
-		default:
-			System.out.println("Enter 1 for Checking or 2 for Savings");
-			input.close();
-		}
+		
+		account.setBalance(STARTING_BALANCE);
+		account.setApproved(false);
+		account.setOwnerId(u.getId());
 //		FIND NEXT AVAILABLE ACCOUNT NUMBER
 		int accountID = 0;
-		User user = new User();
-		File[] files = new File("Users").listFiles();
-		List<Account> act = new ArrayList<Account>();
-		
-		for(File file : files) {
-			try {
-				FileInputStream fileIn = new FileInputStream(new File("Users\\" + file.getName()));
-				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-				user = (User) objectIn.readObject();
-				
-				if(user.getAccounts() != null) {
-					act.addAll(user.getAccounts());
-				}
-				for(Account a : act) {
-					if(accountID < a.getId()) {
-						accountID = a.getId();
-					}
-				}
-				objectIn.close();
-				fileIn.close();
-			} catch (FileNotFoundException e) {
-				// TODO: handle exception
-				System.out.println("File not found");
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO: handle exception
-				e.printStackTrace();
-				System.out.println("User could not be located");
-			} catch (ClassNotFoundException e) {
-				System.out.println("User is not defined");
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO: handle exception
-				e.printStackTrace();
+		accounts = adf.getAccounts();
+		for(Account a : accounts) {
+			if(accounts.isEmpty()) {
+				accountID = 1;
+			} else {
+				accountID = (a.getId() > accountID) ? a.getId() : accountID;
 			}
 		}
 //		SET NEXT ACCOUNT NUMBER TO ID
 		account.setId(accountID + 1);
-//		LINK ACCOUNT WITH USER ID
-		account.setOwnerId(u.getId());
-		account.setBalance(STARTING_BALANCE);
-//		SET APPROVAL
-		System.out.println("Account approved? \n(1.) Yes \n(2.) No)");
-		int approve = input.nextInt();
-		boolean b = (approve == 1) ? true : false;
-		account.setApproved(b);
 //		GENERATE TRANSACTION DETAIL FOR STARTING BALANCE
-		List<Transaction> myTransactions = new ArrayList<>();
-		Transaction t = new Transaction();
 		t.setAmount(STARTING_BALANCE);
 		t.setTimestamp();
 		t.setType(TransactionType.DEPOSIT);
 		myTransactions.add(t);
 //		SET TRANSACTION TO ACCOUNT
 		account.setTransactions(myTransactions);
+		adf.addAccount(account);
 		System.out.println("Account created");
 		
 		return account;

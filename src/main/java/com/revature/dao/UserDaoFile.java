@@ -27,7 +27,7 @@ import com.revature.exceptions.InvalidCredentialsException;
  */
 public class UserDaoFile implements UserDao {
 	
-	public static String fileLocation = "Users";
+	public static String fileLocation = ".\\Users";
 
 	public User addUser(User user) {
 		// TODO Auto-generated method stub
@@ -55,33 +55,14 @@ public class UserDaoFile implements UserDao {
 
 	public User getUser(Integer userId) {
 		// TODO Auto-generated method stub
+		List<User> users = new ArrayList<User>();
 		User user = new User();
-		File[] files = new File(fileLocation).listFiles();
 		
-		for(File file : files) {
-			String doc = file.getName().split("\\.", 2)[0];
-			if(doc.matches(userId.toString())) {
-				try {
-					FileInputStream fileIn = new FileInputStream(fileLocation + "\\" + doc);
-					ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-					user = (User) objectIn.readObject();
-					objectIn.close();
-					fileIn.close();
-				} catch (FileNotFoundException e) {
-					// TODO: handle exception
-					System.out.println("File not found");
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO: handle exception
-					e.printStackTrace();
-					System.out.println("User could not be located");
-				} catch (ClassNotFoundException e) {
-					System.out.println("User is not defined");
-					e.printStackTrace();
-				} catch (Exception e) {
-					// TODO: handle exception
-					e.printStackTrace();
-				}
+		users = getAllUsers();
+		
+		for(User u : users) {
+			if(u.getId() == userId) {
+				user = u;
 				break;
 			}
 		}
@@ -90,103 +71,81 @@ public class UserDaoFile implements UserDao {
 
 	public User getUser(String username, String pass) {
 		// TODO Auto-generated method stub
-		String doc;
-		User u = new User();
-		File[] files = new File(fileLocation).listFiles();
+		List<User> users = new ArrayList<User>();
+		User user = new User();
+		users = getAllUsers();
 		
-		for(File file : files) {
-			doc = file.getName();
+		for(User u : users) {
 			
-			try {
-				FileInputStream fileIn = new FileInputStream(fileLocation + "\\" + doc);
-				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-				User user = (User) objectIn.readObject();
-				objectIn.close();
-				fileIn.close();
+			if(username.matches(u.getUsername())) {
 				
-				if(username.matches(user.getUsername())) {
-					
-					if(pass.matches(user.getPassword())) {
-						u = user;
-						System.out.println("Log in successful");
-						break;	
-					}
-					
+				if(pass.matches(u.getPassword())) {
+					user = u;
+					System.out.println("Log in successful");
+					break;	
 				}
-	
-			} catch(FileNotFoundException e) {
-				System.out.println("User is not found");
-				e.printStackTrace();
-			} catch(IOException e) {
-				System.out.println("Could not return user");
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				System.out.println("User not found. You must register first");
-				e.printStackTrace();
-			} catch(Exception e) {
-				e.printStackTrace();
+				
 			}
 		}
-		return u;
+		return user;
 	}
 
 	public List<User> getAllUsers() {
 		// TODO Auto-generated method stub
 		List<User> users = new ArrayList<User>();
 		File[] files = new File(fileLocation).listFiles();
-		
-		try {
+		if(files.length > 0) {
 			for(File file : files) {
-				FileInputStream fileIn = new FileInputStream(fileLocation + "\\" + file.getName());
-				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-				User user = (User) objectIn.readObject();
-				users.add(user);
-				objectIn.close();
-				fileIn.close();
-			}
-		} catch(FileNotFoundException e) {
-			System.out.println("User is not found");
-			e.printStackTrace();
-		} catch(IOException e) {
-			System.out.println("Could not return user");
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			System.out.println("User not found. You must register first");
-			e.printStackTrace();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return users;
-	}
-
-	public User updateUser(User u) {
-		// TODO Auto-generated method stub
-		File[] files = new File(fileLocation).listFiles();
-		
-		for(File file : files) {
-			int docID = Integer.parseInt(file.getName().split("\\.", 2)[0]);
-			
-			if(u.getId().equals(docID)) {
-				
 				try {
-					FileOutputStream fileOut = new FileOutputStream(fileLocation + "\\" + file.getName(), false);
-					ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-					objectOut.writeObject(u);
-					objectOut.close();
-					fileOut.close();
-					System.out.println("User updated");
+					FileInputStream fileIn = new FileInputStream(fileLocation + "\\" + file.getName());
+					ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+					User user = (User) objectIn.readObject();
+					users.add(user);
+					objectIn.close();
+					fileIn.close();
 				} catch(FileNotFoundException e) {
 					System.out.println("User is not found");
 					e.printStackTrace();
 				} catch(IOException e) {
 					System.out.println("Could not return user");
 					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					System.out.println("User not found. You must register first");
+					e.printStackTrace();
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
-				
 			}
-			break;
+		}
+		return users;
+	}
+
+	public User updateUser(User u) {
+		// TODO Auto-generated method stub
+		int docID = 0;
+		File[] files = new File(fileLocation).listFiles();
+		
+		if(files.length > 0) {
+			for(File file : files) {
+				docID = Integer.parseInt(file.getName().split("\\.", 2)[0]);
+				if(docID == u.getId()) {
+					try {
+						FileOutputStream fos = new FileOutputStream(fileLocation + "\\" + file.getName());
+						ObjectOutputStream oos = new ObjectOutputStream(fos);
+						oos.writeObject(u);
+						oos.close();
+						fos.close();
+						System.out.println("User updated");
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
+				}
+			}
 		}
 		return u;
 	}
@@ -194,13 +153,16 @@ public class UserDaoFile implements UserDao {
 	public boolean removeUser(User u) {
 		// TODO Auto-generated method stub
 		File[] files = new File(fileLocation).listFiles();
+		boolean removed = false;
+		
 		for(File file : files) {
-			String doc = file.getName();
-			if( u.getId() == Integer.parseInt(doc.split(".", 2)[0]) ) {
-				return file.delete();
+			int docID = Integer.parseInt(file.getName().split("\\.", 2)[0]);
+			if( u.getId() == docID ) {
+				removed = file.delete();
+				break;
 			}
 		}
-		return false;
+		return removed;
 	}
 
 }
