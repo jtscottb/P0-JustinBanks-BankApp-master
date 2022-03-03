@@ -36,18 +36,21 @@ public class BankApplicationDriver {
 	
 	public static User Startup() {
 		Scanner input = new Scanner(System.in);
-		System.out.println("(1.) Sign in \n(2.) Register?");
+		System.out.println("(1.) Register \n(2.) Sign in");
 		User u = null;
 		int action = input.nextInt();
 		
 		switch(action) {
 		case 1:
 			BeginRegistration();
+			break;
 		case 2:
 			u = SignIn();
+			break;
 		default:
 			System.out.println("Enter 1 or 2");
 			u = Startup();
+			break;
 		}
 		return u;
 	}
@@ -90,9 +93,9 @@ public class BankApplicationDriver {
 			//8
 			Customer(user);
 		} else if(user.getUserType().equals(employee.getUserType())) {
-			//As an employee, I can approve or reject an account.
+			//As an employee, I can approve or reject an account.		DONE - 2
 			//As an employee, I can view a log of all transactions.		DONE - 2
-			//2
+			//4
 			Employee(user);
 		}
 		

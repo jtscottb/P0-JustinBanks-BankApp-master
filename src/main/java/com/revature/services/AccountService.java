@@ -262,7 +262,10 @@ public class AccountService {
 	 * @return true if account is approved, or false if unapproved
 	 */
 	public boolean approveOrRejectAccount(Account a, boolean approval) {
-		
-		return false;
+		AccountDaoFile adf = new AccountDaoFile();
+		a.setApproved(approval);
+		adf.updateAccount(a);
+		System.out.println( approval ? "Account approved" : "Account rejected");
+		return approval;
 	}
 }
