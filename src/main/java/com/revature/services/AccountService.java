@@ -17,6 +17,7 @@ import com.revature.beans.User;
 import com.revature.beans.Account.AccountType;
 import com.revature.beans.Transaction.TransactionType;
 import com.revature.dao.AccountDao;
+import com.revature.dao.AccountDaoDB;
 import com.revature.dao.AccountDaoFile;
 import com.revature.driver.BankApplicationDriver;
 import com.revature.exceptions.OverdraftException;
@@ -53,23 +54,31 @@ public class AccountService {
 			Transaction action = new Transaction();
 			Account account = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
+			AccountDaoDB adb = new AccountDaoDB();
+			
 //			COPY ACCOUNT FROM USER FILE
 			account = adf.getAccount(a.getId());
+			
 //			CREATE TRANSACTION DETAILS
 			action.setType(TransactionType.WITHDRAWAL);
 			action.setSender(account);
 			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
+			
 //			ADJUST ACCOUNT BALANCE
 			a.setBalance(a.getBalance() - amount);
+			
 //			COPY EXISTING TRANSACTIONS
 			transactions = a.getTransactions();
+			
 //			ADD NEW TRANSACTION AND SET NEW TRANSACTION LIST TO ACCOUNT
 			transactions.add(action);
 			a.setTransactions(transactions);
+			
 //			UPDATE USER FILE WITH UPDATED ACCOUNT
 			adf.updateAccount(a);
+			adb.updateAccount(a);
 		}
 	}
 	
@@ -88,23 +97,31 @@ public class AccountService {
 			Transaction action = new Transaction();
 			Account account = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
+			AccountDaoDB adb = new AccountDaoDB();
+			
 //			COPY ACCOUNT
 			account = adf.getAccount(a.getId());
+			
 //			CREATE TRANSACTION DETAILS
 			action.setType(TransactionType.DEPOSIT);
 			action.setSender(account);
 			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
+			
 //			UPDATE ACCOUNT BALANCE
 			a.setBalance(a.getBalance() + amount);
+			
 //			COPY EXISTING TRANSACTIONS AND ADD NEW TRANSACTION TO LIST
 			transactions = a.getTransactions();
 			transactions.add(action);
+			
 //			SET NEW TRANSACTION TO TRANSACTION LIST IN ACCOUNT
 			a.setTransactions(transactions);
+			
 //			UPDATE USER FILE WITH UPDATED ACCOUNT
 			adf.updateAccount(a);
+			adb.updateAccount(a);
 		}
 	}
 	
@@ -127,47 +144,54 @@ public class AccountService {
 		} else if(!toAct.isApproved()) {
 			throw new UnsupportedOperationException("Recipient account is not approved");
 		} else {
-//			SENDER TRANSACTION
 			List<Transaction> transactions = new ArrayList<Transaction>();
 			Transaction t = new Transaction();
 			Account a = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
+			AccountDaoDB adb = new AccountDaoDB();
+			
+//			SENDER TRANSACTION
 //			COPY ACCOUNT
 			a = adf.getAccount(fromAct.getId());
+			
 //			SETUP NEW TRANSACTION DETAILS
 			t.setType(TransactionType.TRANSFER);
 			t.setSender(a);
 			t.setRecipient(toAct);
 			t.setAmount(amount);
 			t.setTimestamp();
+			
 //			UPDATE ACCOUNT BALANCE
 			fromAct.setBalance(fromAct.getBalance() - amount);
+			
 //			COPY TRANSACTIONS FROM ACCOUNT AND ADD NEW TRANSACTION
 			transactions = fromAct.getTransactions();
+			
 //			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
 			fromAct.setTransactions(transactions);
 			adf.updateAccount(fromAct);
+			adb.updateAccount(fromAct);
 			
-//			RECEIVER TRANSACTION.
-			List<Transaction> receiverTransactions = new ArrayList<Transaction>();
-			Transaction tr = new Transaction();
-			Account ar = new Account();
-			AccountDaoFile adfr = new AccountDaoFile();
+//			RECEIVER TRANSACTION
 //			COPY ACCOUNT
-			ar = adf.getAccount(fromAct.getId());
+			a = adf.getAccount(fromAct.getId());
+			
 //			SETUP NEW TRANSACTION DETAILS
-			tr.setType(TransactionType.TRANSFER);
-			tr.setSender(fromAct);
-			tr.setRecipient(ar);
-			tr.setAmount(amount);
-			tr.setTimestamp();
+			t.setType(TransactionType.TRANSFER);
+			t.setSender(fromAct);
+			t.setRecipient(a);
+			t.setAmount(amount);
+			t.setTimestamp();
 //			UPDATE ACCOUNT BALANCE
 			toAct.setBalance(toAct.getBalance() + amount);
+			
 //			COPY TRANSACTIONS FROM ACCOUNT AND ADD NEW TRANSACTION
-			receiverTransactions = toAct.getTransactions();
+			transactions = toAct.getTransactions();
+			
 //			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
-			toAct.setTransactions(receiverTransactions);
+			toAct.setTransactions(transactions);
 			adf.updateAccount(toAct);
+			adb.updateAccount(toAct);
 		}
 	}
 	
@@ -179,12 +203,17 @@ public class AccountService {
 		List<Transaction> myTransactions = new ArrayList<>();
 		List<Account> accounts = new ArrayList<Account>();
 		AccountDaoFile adf = new AccountDaoFile();
+		AccountDaoDB adb = new AccountDaoDB();
 		Transaction t = new Transaction();
 		Account account = new Account();
 		
 		account.setBalance(STARTING_BALANCE);
 		account.setApproved(false);
 		account.setOwnerId(u.getId());
+		
+//		ADD ACCOUNT TO DATABASE
+		adb.addAccount(account);
+		
 //		FIND NEXT AVAILABLE ACCOUNT NUMBER
 		int accountID = 0;
 		accounts = adf.getAccounts();
@@ -195,13 +224,16 @@ public class AccountService {
 				accountID = (a.getId() > accountID) ? a.getId() : accountID;
 			}
 		}
+		
 //		SET NEXT ACCOUNT NUMBER TO ID
 		account.setId(accountID + 1);
+		
 //		GENERATE TRANSACTION DETAIL FOR STARTING BALANCE
 		t.setAmount(STARTING_BALANCE);
 		t.setTimestamp();
 		t.setType(TransactionType.DEPOSIT);
 		myTransactions.add(t);
+		
 //		SET TRANSACTION TO ACCOUNT
 		account.setTransactions(myTransactions);
 		adf.addAccount(account);
@@ -219,8 +251,10 @@ public class AccountService {
 	 */
 	public boolean approveOrRejectAccount(Account a, boolean approval) {
 		AccountDaoFile adf = new AccountDaoFile();
+		AccountDaoDB adb = new AccountDaoDB();
 		a.setApproved(approval);
 		adf.updateAccount(a);
+		adb.updateAccount(a);
 		System.out.println( approval ? "Account approved" : "Account rejected");
 		return approval;
 	}

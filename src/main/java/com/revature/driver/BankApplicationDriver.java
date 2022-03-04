@@ -10,9 +10,11 @@ import com.revature.beans.Transaction.TransactionType;
 import com.revature.beans.User;
 import com.revature.beans.User.UserType;
 import com.revature.dao.AccountDao;
+import com.revature.dao.AccountDaoDB;
 import com.revature.dao.AccountDaoFile;
 import com.revature.dao.TransactionDaoFile;
 import com.revature.dao.UserDao;
+import com.revature.dao.UserDaoDB;
 import com.revature.dao.UserDaoFile;
 import com.revature.services.AccountService;
 import com.revature.services.UserService;
@@ -36,7 +38,7 @@ public class BankApplicationDriver {
 	
 	public static User Startup() {
 		Scanner input = new Scanner(System.in);
-		System.out.println("(1.) Register \n(2.) Sign in");
+		System.out.println("Welcome \n(1.) Register \n(2.) Sign in");
 		User u = null;
 		int action = input.nextInt();
 		
@@ -57,40 +59,10 @@ public class BankApplicationDriver {
 	
 	public static void BeginRegistration() {
 		Scanner input = new Scanner(System.in);
-		List<User> users = new ArrayList<User>();
-		UserDao udf = new UserDaoFile();
-		AccountDao adf = new AccountDaoFile();
 		User newUser = new User();
-		users = udf.getAllUsers();
-//		FIND NEXT AVAILABLE USER ID NUMBER FROM USER LIST
-		int nextID = 0;
-		for(User u : users) {
-			if(users.isEmpty()) {
-				nextID = 1;
-			} else {
-				nextID = (u.getId() > nextID) ? u.getId() : nextID;
-			}
-		}
-//		ASSIGN NEXT ID NUMBER TO NEW USER
-		newUser.setId(nextID + 1);
-//		SELECT USERNAME
-		System.out.println("Enter username: ");
-		String username = input.next();
-		newUser.setUsername(username);
-//		CHOOSE PASSWORD
-		System.out.println("Enter password: ");
-		String password = input.next();
-		newUser.setPassword(password);
-//		ENTER FIRST NAME
-		System.out.println("Enter First Name: ");
-		String fname = input.next().toUpperCase();
-		newUser.setFirstName(fname);
-//		ENTER LAST NAME
-		System.out.println("Enter Last Name: ");
-		String lname = input.next().toUpperCase();
-		newUser.setLastName(lname);
+		
 //		CHOOSE USER TYPE
-		System.out.println("(1.) Customer or \n(2.) Employee");
+		System.out.println("Select user type: \n(1.) Customer \n(2.) Employee");
 		int userType = input.nextInt();
 		switch (userType) {
 		case 1:
@@ -103,25 +75,51 @@ public class BankApplicationDriver {
 			BeginRegistration();
 			break;
 		}
+		
+//		SELECT USERNAME
+		System.out.println("Enter username: ");
+		String username = input.next();
+		newUser.setUsername(username);
+		
+//		CHOOSE PASSWORD
+		System.out.println("Enter password: ");
+		String password = input.next();
+		newUser.setPassword(password);
+		
+//		ENTER FIRST NAME
+		System.out.println("Enter First Name: ");
+		String fname = input.next().toUpperCase();
+		newUser.setFirstName(fname);
+		
+//		ENTER LAST NAME
+		System.out.println("Enter Last Name: ");
+		String lname = input.next().toUpperCase();
+		newUser.setLastName(lname);
+		
+//		SET EMPTY ACCOUNTS LIST
 		newUser.setAccounts(new ArrayList<Account>());
 		
-		UserService us = new UserService(udf, adf);
+//		CHECK REGISTRATION
+		UserService us = new UserService(null, null);
 		us.register(newUser);
 	}
 	
 	public static User SignIn() {
 		Scanner input = new Scanner(System.in);
 		UserService us = new UserService(null, null);
+		
 //		OBTAIN LOGIN INFO
 		System.out.println("Enter username: ");
 		String username = input.next();
 		System.out.println("Enter password: ");
 		String password = input.next();
+		
 //		CHECK CREDENTIALS
 		User u = us.login(username, password);
 		
 //		STORE WHO'S LOGGED ON
 		SessionCache.setCurrentUser(u);
+		
 //		RETURN LOGGED IN USER
 		return u;
 	}
@@ -169,14 +167,16 @@ public class BankApplicationDriver {
 				+ "\n(2.) View balance of my account"
 				+ "\n(3.) Deposit to an account"
 				+ "\n(4.) Make a withdrawal"
-				+ "\n(5.) Transfer money to an account");
+				+ "\n(5.) Transfer money to an account"
+				+ "\n(6.) Exit");
 		
 //		CHOICE SETUP
 		choice = input.nextInt();
-		AccountDao adf = new AccountDaoFile();
-		AccountService as = new AccountService(adf);
+		AccountDaoFile adf = new AccountDaoFile();
+		AccountDaoDB adb = new AccountDaoDB();
+		AccountService as = new AccountService(null);
 		List<Account> accounts = adf.getAccountsByUser(user);
-		User u = user;
+//		List<Account> accounts = adb.getAccountsByUser(user);
 		Account a = new Account();
 		Account a2 = new Account();
 		int num = 0;
@@ -186,8 +186,9 @@ public class BankApplicationDriver {
 		case 1:	//Apply for new account
 			a = as.createNewAccount(user);
 			a = adf.getAccount(a.getId());
+			
 //			CHOOSE ACCOUNT TYPE
-			System.out.println("Enter \n(1.) Checking or \n(2.) Savings");
+			System.out.println("Choose account type: \n(1.) Checking \n(2.) Savings");
 			int accountType = input.nextInt();
 			switch(accountType) {
 			case 1:
@@ -197,16 +198,19 @@ public class BankApplicationDriver {
 				a.setType(AccountType.SAVINGS);
 				break;
 			}
+			
 			a2 = adf.updateAccount(a);
 			System.out.println(a2);
 			break;
 			
 		case 2:	//View balance of my account
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
-			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + " Account Type: " + account.getType()));
+			
 //			SELECT ACCOUNT TO VIEW BALANCE
 			System.out.println("Enter account number: ");
 			num = input.nextInt();
+			
 //			COPY ACCOUNT AND PRINT BALANCE
 			a = adf.getAccount(num);
 			System.out.println(a.getBalance());
@@ -214,14 +218,17 @@ public class BankApplicationDriver {
 			
 		case 3:	//Deposit to an account
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
-			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + " Account Type: " + account.getType()));
+			
 //			CHOOSE ACCOUNT TO DEPOSIT AND COPY ACCOUNT
 			System.out.println("Enter account number: ");
 			num = input.nextInt();
 			a = adf.getAccount(num);
+			
 //			ENTER AMOUNT TO DEPOSIT
 			System.out.println("Enter amount to deposit: ");
 			amount = input.nextDouble();
+			
 //			DEPOSIT AMOUNT AND PRINT UPDATED ACCOUNT
 			as.deposit(a, amount);
 			System.out.println(adf.getAccount(num));
@@ -229,14 +236,17 @@ public class BankApplicationDriver {
 			
 		case 4:	//Make a withdrawal
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
-			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + " Account Type: " + account.getType()));
+			
 //			CHOOSE ACCOUNT TO WITHDRAW AND COPY ACCOUNT
 			System.out.println("Enter account number: ");
 			num = input.nextInt();
 			a = adf.getAccount(num);
+			
 //			ENTER AMOUNT TO WITHDRAW
 			System.out.println("Enter amount to withdraw: ");
 			amount = input.nextDouble();
+			
 //			WITHDRAW AMOUNT AND PRINT UPDATED ACCOUNT
 			as.withdraw(a, amount);
 			System.out.println(adf.getAccount(num));
@@ -244,38 +254,41 @@ public class BankApplicationDriver {
 			
 		case 5:	//Transfer money to an account
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
-			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId()));
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + " Account Type: " + account.getType()));
+			
 //			CHOOSE WHICH ACCOUNT TO WITHDRAW FROM
 			System.out.println("Enter account number to withdraw from: ");
 			num = input.nextInt();
+			
 //			COPY WITHDRAW ACCOUNT
 			a = adf.getAccount(num);
+			
 //			CHOOSE WHICH ACCOUNT TO DEPOSIT INTO
 			System.out.println("Enter account number to deposit into: ");
 			int num2 = input.nextInt();
+			
 //			COPY DEPOSIT ACCOUNT
 			AccountDaoFile adf2 = new AccountDaoFile();
 			a2 = adf2.getAccount(num2);
+			
 //			SET TRANSFER AMOUNT
 			System.out.println("Enter amount to transfer: ");
 			amount = input.nextDouble();
+			
 //			TRANSFER AMOUNT AND PRINT BOTH UPDATED ACCOUNTS
 			as.transfer(a, a2, amount);
 			System.out.println(adf.getAccount(a.getId()) + "\n" + adf.getAccount(a2.getId()));
 			break;
-			
+		case 6:
+			input.close();
+			break;
 		}
-		Customer(user);
-	}
-	
-	public static Account StartNewAccount(User user) {
-		Scanner input = new Scanner(System.in);
-		Account account = new Account();
-		AccountDao adf = new AccountDaoFile();
-		AccountService as = new AccountService(adf);
-
 		
-		return account;
+		if(choice > 5) {
+			System.out.println("Goodbye");
+		} else {
+			Customer(user);
+		}
 	}
 
 	public static void Employee(User user) {
@@ -284,7 +297,8 @@ public class BankApplicationDriver {
 		
 		System.out.println("What would you like to do?: "
 				+ "\n(1.) Approve or reject an account"
-				+ "\n(2.) View log of all transactions");
+				+ "\n(2.) View log of all transactions "
+				+ "\n(3.) Exit");
 			
 		choice = input.nextInt();
 		
@@ -319,8 +333,15 @@ public class BankApplicationDriver {
 //			PRINT ALL TRANSACTIONS
 			allTransactions.forEach((account) -> System.out.println(account));
 			break;
+		case 3:
+			input.close();
+			break;
 		}
-		Employee(user);
+		if(choice > 2) {
+			System.out.println("Goodbye");
+		} else {
+			Employee(user);
+		}
 	}
 	
 	//End of bank driver class

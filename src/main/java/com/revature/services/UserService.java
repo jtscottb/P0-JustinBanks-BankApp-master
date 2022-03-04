@@ -21,6 +21,7 @@ import com.revature.beans.User.UserType;
 import com.revature.dao.AccountDao;
 import com.revature.dao.AccountDaoFile;
 import com.revature.dao.UserDao;
+import com.revature.dao.UserDaoDB;
 import com.revature.dao.UserDaoFile;
 import com.revature.driver.BankApplicationDriver;
 import com.revature.exceptions.InvalidCredentialsException;
@@ -46,7 +47,9 @@ public class UserService {
 	 */
 	public User login(String username, String password) {
 		UserDaoFile udf = new UserDaoFile();
+		UserDaoDB udb = new UserDaoDB();
 		User user = (User) udf.getUser(username, password);
+//		User user = (User) udb.getUser(username, password);
 		if(user == null) {
 			System.out.println("Incorrect username or password");
 			throw new InvalidCredentialsException();
@@ -61,20 +64,40 @@ public class UserService {
 	 */
 	public void register(User newUser) {
 		UserDaoFile udf = new UserDaoFile();
+		UserDaoDB udb = new UserDaoDB();
+		
 //		CHECK TO SEE IF ANOTHER USER HAS USERNAME
 		List<User> users = new ArrayList<User>();
 		users = udf.getAllUsers();
+//		users = udb.getAllUsers();
 		List<String> usernameList = new ArrayList<String>();
 		for(User u : users) {
 			usernameList.add(u.getUsername());
 		}
+		
 //		THROW EXCEPTION IF USERNAME EXISTS
 		if(usernameList.contains(newUser.getUsername())) {
 			System.out.println("Username already taken");
 			throw new UsernameAlreadyExistsException();
 		} else {
+			udb.addUser(newUser);
+			
+//			FIND NEXT AVAILABLE USER ID NUMBER FROM USER LIST
+			int nextID = 0;
+			for(User u : users) {
+				if(users.isEmpty()) {
+					nextID = 1;
+				} else {
+					nextID = (u.getId() > nextID) ? u.getId() : nextID;
+				}
+			}
+			
+//			ASSIGN NEXT ID NUMBER TO NEW USER
+			newUser.setId(nextID + 1);
+			
 	//		CREATE NEW USER FILE
 			udf.addUser(newUser);
+			System.out.println("User registered successfully!");
 		}
 	}
 }
