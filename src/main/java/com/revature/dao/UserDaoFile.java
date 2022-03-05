@@ -81,7 +81,6 @@ public class UserDaoFile implements UserDao {
 				
 				if(pass.matches(u.getPassword())) {
 					user = u;
-					System.out.println("Log in successful");
 					break;	
 				}
 				

@@ -58,6 +58,7 @@ public class AccountService {
 			
 //			COPY ACCOUNT FROM USER FILE
 			account = adf.getAccount(a.getId());
+//			account = adb.getAccount(a.getId());
 			
 //			CREATE TRANSACTION DETAILS
 			action.setType(TransactionType.WITHDRAWAL);
@@ -101,6 +102,7 @@ public class AccountService {
 			
 //			COPY ACCOUNT
 			account = adf.getAccount(a.getId());
+//			account = adb.getAccount(a.getId());
 			
 //			CREATE TRANSACTION DETAILS
 			action.setType(TransactionType.DEPOSIT);
@@ -153,6 +155,7 @@ public class AccountService {
 //			SENDER TRANSACTION
 //			COPY ACCOUNT
 			a = adf.getAccount(fromAct.getId());
+//			a = adb.getAccount(fromAct.getId());
 			
 //			SETUP NEW TRANSACTION DETAILS
 			t.setType(TransactionType.TRANSFER);
@@ -175,6 +178,7 @@ public class AccountService {
 //			RECEIVER TRANSACTION
 //			COPY ACCOUNT
 			a = adf.getAccount(fromAct.getId());
+//			a = adb.getAccount(toAct.getId());
 			
 //			SETUP NEW TRANSACTION DETAILS
 			t.setType(TransactionType.TRANSFER);
@@ -211,9 +215,6 @@ public class AccountService {
 		account.setApproved(false);
 		account.setOwnerId(u.getId());
 		
-//		ADD ACCOUNT TO DATABASE
-		adb.addAccount(account);
-		
 //		FIND NEXT AVAILABLE ACCOUNT NUMBER
 		int accountID = 0;
 		accounts = adf.getAccounts();
@@ -235,8 +236,9 @@ public class AccountService {
 		myTransactions.add(t);
 		
 //		SET TRANSACTION TO ACCOUNT
-		account.setTransactions(myTransactions);
+		account.setTransactions(new ArrayList<Transaction>());
 		adf.addAccount(account);
+		adb.addAccount(account);
 		System.out.println("Account created");
 		
 		return account;

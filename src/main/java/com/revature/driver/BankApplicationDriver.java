@@ -32,7 +32,6 @@ public class BankApplicationDriver {
 		if(SessionCache.getCurrentUser() == null) {
 			user = SignIn();
 		}
-		System.out.println(user);
 		Selection(user);
 	}
 	
@@ -200,12 +199,13 @@ public class BankApplicationDriver {
 			}
 			
 			a2 = adf.updateAccount(a);
-			System.out.println(a2);
+			adb.updateAccount(a);
+			System.out.println("Account added \n" + a2);
 			break;
 			
 		case 2:	//View balance of my account
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
-			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + " Account Type: " + account.getType()));
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + "\t" + account.getType()));
 			
 //			SELECT ACCOUNT TO VIEW BALANCE
 			System.out.println("Enter account number: ");
@@ -218,7 +218,7 @@ public class BankApplicationDriver {
 			
 		case 3:	//Deposit to an account
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
-			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + " Account Type: " + account.getType()));
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + "\t" + account.getType()));
 			
 //			CHOOSE ACCOUNT TO DEPOSIT AND COPY ACCOUNT
 			System.out.println("Enter account number: ");
@@ -236,7 +236,7 @@ public class BankApplicationDriver {
 			
 		case 4:	//Make a withdrawal
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
-			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + " Account Type: " + account.getType()));
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + "\t" + account.getType()));
 			
 //			CHOOSE ACCOUNT TO WITHDRAW AND COPY ACCOUNT
 			System.out.println("Enter account number: ");
@@ -254,7 +254,7 @@ public class BankApplicationDriver {
 			
 		case 5:	//Transfer money to an account
 //			PRINT LIST OF ACCOUNTS FOR THE CURRENT USER
-			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + " Account Type: " + account.getType()));
+			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + "\t" + account.getType()));
 			
 //			CHOOSE WHICH ACCOUNT TO WITHDRAW FROM
 			System.out.println("Enter account number to withdraw from: ");
@@ -297,7 +297,7 @@ public class BankApplicationDriver {
 		
 		System.out.println("What would you like to do?: "
 				+ "\n(1.) Approve or reject an account"
-				+ "\n(2.) View log of all transactions "
+				+ "\n(2.) View log of all transactions"
 				+ "\n(3.) Exit");
 			
 		choice = input.nextInt();
@@ -328,8 +328,10 @@ public class BankApplicationDriver {
 //			SETUP
 			TransactionDaoFile tdf = new TransactionDaoFile();
 			List<Transaction> allTransactions = new ArrayList<Transaction>();
+			
 //			GET LIST OF ALL TRANSACTIONS BY ALL USERS
 			allTransactions = tdf.getAllTransactions();
+			
 //			PRINT ALL TRANSACTIONS
 			allTransactions.forEach((account) -> System.out.println(account));
 			break;

@@ -53,6 +53,8 @@ public class UserService {
 		if(user == null) {
 			System.out.println("Incorrect username or password");
 			throw new InvalidCredentialsException();
+		} else {
+			System.out.println("Log in successful");
 		}
 		return user;
 	}
@@ -80,8 +82,6 @@ public class UserService {
 			System.out.println("Username already taken");
 			throw new UsernameAlreadyExistsException();
 		} else {
-			udb.addUser(newUser);
-			
 //			FIND NEXT AVAILABLE USER ID NUMBER FROM USER LIST
 			int nextID = 0;
 			for(User u : users) {
@@ -97,6 +97,7 @@ public class UserService {
 			
 	//		CREATE NEW USER FILE
 			udf.addUser(newUser);
+			udb.addUser(newUser);
 			System.out.println("User registered successfully!");
 		}
 	}

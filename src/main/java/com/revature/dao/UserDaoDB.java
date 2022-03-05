@@ -22,20 +22,23 @@ public class UserDaoDB implements UserDao {
 	private static ResultSet rs;
 	
 	public UserDaoDB() {
-		ConnectionUtil.getConnection();
+		conn = ConnectionUtil.getConnection();
 	}
 	
 	public User addUser(User user) {
 		// TODO Auto-generated method stub
-		String query = "insert into users (username, password, firstname, lastname, usertype) values (?, ?, ?, ?, ?)";
+		String query = "insert into users (userid, username, password, firstname, lastname, usertype) values (?, ?, ?, ?, ?, ?)";
+		User u = new User();
+		u.setUserType(UserType.CUSTOMER);
 		try {
 			pstmt = conn.prepareStatement(query);
-			pstmt.setString(1, user.getUsername());
-			pstmt.setString(2, user.getPassword());
-			pstmt.setString(3, user.getFirstName());
-			pstmt.setString(4, user.getLastName());
-			pstmt.setObject(5, user.getUserType());
-			pstmt.executeUpdate(query);
+			pstmt.setInt(1, user.getId().intValue());
+			pstmt.setString(2, user.getUsername());
+			pstmt.setString(3, user.getPassword());
+			pstmt.setString(4, user.getFirstName());
+			pstmt.setString(5, user.getLastName());
+			pstmt.setObject(6, (user.getUserType().equals(u.getUserType())) ? 1 : 2);
+			pstmt.executeUpdate();
 			if (rs != null)
 				rs.close();
 			if (pstmt != null)
@@ -112,14 +115,16 @@ public class UserDaoDB implements UserDao {
 	public User updateUser(User u) {
 		// TODO Auto-generated method stub
 		String query = "update users set username=?, password=?, firstname=?, lastname=?, usertype=? where userid =" + u.getId().intValue();
+		User user = new User();
+		user.setUserType(UserType.CUSTOMER);
 		try {
 			pstmt = conn.prepareStatement(query);
 			pstmt.setString(1, u.getUsername());
 			pstmt.setString(2, u.getPassword());
 			pstmt.setString(3, u.getFirstName());
 			pstmt.setString(4, u.getLastName());
-			pstmt.setObject(5, u.getUserType());
-			pstmt.executeUpdate(query);
+			pstmt.setObject(5, (u.getUserType().equals(user.getUserType()) ? 1 : 2));
+			pstmt.executeUpdate();
 			if (rs != null)
 				rs.close();
 			if (pstmt != null)
@@ -132,6 +137,7 @@ public class UserDaoDB implements UserDao {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
+		System.out.println("User updated");
 		return u;
 	}
 
@@ -153,6 +159,7 @@ public class UserDaoDB implements UserDao {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
+		System.out.println((status) ? "User removed" : "User removal failed");
 		return status;
 	}
 
