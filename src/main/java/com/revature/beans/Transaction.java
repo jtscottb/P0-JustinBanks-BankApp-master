@@ -65,7 +65,7 @@ public class Transaction implements Serializable {
 		this.timestamp = timestamp;
 	}
 	public void setTimestamp() {
-		this.timestamp = LocalDateTime.now();
+		this.timestamp = LocalDateTime.now().withNano(0);
 	}
 	@Override
 	public int hashCode() {

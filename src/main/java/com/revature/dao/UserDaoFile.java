@@ -76,14 +76,11 @@ public class UserDaoFile implements UserDao {
 		users = getAllUsers();
 		
 		for(User u : users) {
-			
-			if(username.matches(u.getUsername())) {
-				
-				if(pass.matches(u.getPassword())) {
+			if(u.getUsername().equals(username)) {
+				if(u.getPassword().equals(pass)) {
 					user = u;
-					break;	
+					break;
 				}
-				
 			}
 		}
 		return user;

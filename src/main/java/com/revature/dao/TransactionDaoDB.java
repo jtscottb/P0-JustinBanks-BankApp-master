@@ -12,6 +12,7 @@ import com.revature.beans.Account;
 import com.revature.beans.Transaction;
 import com.revature.beans.Transaction.TransactionType;
 import com.revature.beans.User;
+import com.revature.beans.Account.AccountType;
 import com.revature.beans.User.UserType;
 import com.revature.utils.ConnectionUtil;
 
@@ -30,6 +31,7 @@ public class TransactionDaoDB implements TransactionDao {
 		// TODO Auto-generated method stub
 		Transaction action = new Transaction();
 		List<Transaction> transactions = new ArrayList<Transaction>();
+		
 		String query = "select * from transactions";
 		try {
 			stmt = conn.createStatement();
@@ -38,7 +40,15 @@ public class TransactionDaoDB implements TransactionDao {
 				action.setSender((Account) rs.getObject("accountid"));
 				action.setRecipient((Account) rs.getObject("recipientid"));
 				action.setAmount(rs.getDouble("amount"));
-				action.setType((TransactionType) rs.getObject("type"));
+				String type = rs.getString("type");
+				switch(type) {
+				case "DEPOSIT":
+					action.setType(TransactionType.DEPOSIT);
+				case "WITHDRAWAL":
+					action.setType(TransactionType.WITHDRAWAL);
+				case "TRANSFER":
+					action.setType(TransactionType.TRANSFER);
+				}
 				action.setTimestamp((LocalDateTime) rs.getObject("timestamp"));
 				transactions.add(action);
 			}
@@ -48,13 +58,72 @@ public class TransactionDaoDB implements TransactionDao {
 				pstmt.close();
 			if (stmt != null)
 				stmt.close();
-			if (conn != null)
-				conn.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
 		return transactions;
+	}
+	
+	public Transaction addTransaction(Transaction t) {
+		// TODO Auto-generated method stub
+		String query = "insert into accounts (accountid, recipientid, amount, type, timestamp) values (?, ?, ?, ?, ?)";
+		Transaction transaction1 = new Transaction();
+		Transaction transaction2 = new Transaction();
+		Transaction transaction3 = new Transaction();
+		transaction1.setType(TransactionType.DEPOSIT);
+		transaction2.setType(TransactionType.WITHDRAWAL);
+		transaction3.setType(TransactionType.TRANSFER);
+		
+		String type = null;
+		if(t.getType().equals(transaction1.getType())) {
+			type = "DEPOSIT";
+		} else if(t.getType().equals(transaction2.getType())) {
+			type = "WITHDRAWAL";
+		} else if(t.getType().equals(transaction3.getType())) {
+			type = "TRANSFER";
+		}
+		
+		int senderID = t.getSender().getId();
+		int recipientID = t.getRecipient().getId();
+		System.out.println(senderID + "\n" + recipientID);
+		
+		try {
+			pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, senderID);
+			pstmt.setInt(2, recipientID);
+			pstmt.setDouble(3, t.getAmount().doubleValue());
+			pstmt.setString(4, type);
+			pstmt.setObject(5, t.getTimestamp());
+			pstmt.executeUpdate();
+			if (rs != null)
+				rs.close();
+			if (pstmt != null)
+				pstmt.close();
+			if (stmt != null)
+				stmt.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return t;
+	}
+	
+	public void removeTransaction(Transaction t) {
+		String query = "delete from transactions where timestamp=" + t.getTimestamp();
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(query);
+			if (rs != null)
+				rs.close();
+			if (pstmt != null)
+				pstmt.close();
+			if (stmt != null)
+				stmt.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -33,29 +33,33 @@ public class AccountDaoDB implements AccountDao {
 	public Account addAccount(Account a) {
 		// TODO Auto-generated method stub
 		String query = "insert into accounts (accountid, userid, balance, type, approved) values (?, ?, ?, ?, ?)";
-		Account act = new Account();
-		act.setType(AccountType.CHECKING);
+		Account account1 = new Account();
+		Account account2 = new Account();
+		account1.setType(AccountType.CHECKING);
+		account2.setType(AccountType.SAVINGS);
+		String type = null;
+		
+		if(a.getType() != null) {
+			if(a.getType().equals(account1.getType())) {
+				type = "CHECKING";
+			} else if(a.getType().equals(account2.getType())) {
+				type = "SAVINGS";
+			}
+		}
+		
 		try {
 			pstmt = conn.prepareStatement(query);
 			pstmt.setInt(1, a.getId().intValue());
 			pstmt.setInt(2, a.getOwnerId().intValue());
 			pstmt.setDouble(3, a.getBalance().doubleValue());
-			pstmt.setObject(4, (a.getType().equals(act.getType())) ? 1 : 2);
+			pstmt.setString(4, type);
 			pstmt.setBoolean(5, a.isApproved());
 			pstmt.executeUpdate();
-			if (rs != null)
-				rs.close();
-			if (pstmt != null)
-				pstmt.close();
-			if (stmt != null)
-				stmt.close();
-			if (conn != null)
-				conn.close();
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-		System.out.println("Account added");
 		return a;
 	}
 
@@ -77,6 +81,7 @@ public class AccountDaoDB implements AccountDao {
 		Account account = new Account();
 		List<Account> accounts = new ArrayList<Account>();
 		String query = "select * from accounts";
+		
 		try {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
@@ -84,8 +89,16 @@ public class AccountDaoDB implements AccountDao {
 				account.setId(rs.getInt("accountid"));
 				account.setOwnerId(rs.getInt("userid"));
 				account.setBalance(rs.getDouble("balance"));
-				account.setType((AccountType) rs.getObject("type"));
-				account.setApproved((boolean) rs.getObject("approved"));
+				
+				if(rs.getString("type") == "CHECKING") {
+					account.setType(AccountType.CHECKING);
+				} else if(rs.getString("type") == "SAVINGS") {
+					account.setType(AccountType.SAVINGS);
+				} else {
+					account.setType(null);
+				}
+				
+				account.setApproved((rs.getObject("approved").equals(1) ? true : false));
 				accounts.add(account);
 			}
 			if (rs != null)
@@ -94,8 +107,6 @@ public class AccountDaoDB implements AccountDao {
 				pstmt.close();
 			if (stmt != null)
 				stmt.close();
-			if (conn != null)
-				conn.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -116,22 +127,30 @@ public class AccountDaoDB implements AccountDao {
 
 	public Account updateAccount(Account a) {
 		// TODO Auto-generated method stub
-		String query = "update accounts set accountid=?, userid=?, balance=?, type=?, approved=?";
-		Account account = new Account();
-		account.setType(AccountType.CHECKING);
+		String query = "update accounts set userid=?, balance=?, type=?, approved=? where accountid=" + a.getId().intValue();
+		Account account1 = new Account();
+		Account account2 = new Account();
+		account1.setType(AccountType.CHECKING);
+		account2.setType(AccountType.SAVINGS);
+		String type = null;
+		
+		if(a.getType().equals(account1.getType())) {
+			type = "CHECKING";
+		} else if(a.getType().equals(account2.getType())) {
+			type = "SAVINGS";
+		}
+		
 		try {
 			pstmt = conn.prepareStatement(query);
-			pstmt.setInt(1, a.getId().intValue());
-			pstmt.setInt(2, a.getOwnerId().intValue());
-			pstmt.setDouble(3, a.getBalance().doubleValue());
-			pstmt.setObject(4, (a.getType().equals(account.getType())) ? 1 : 2);
-			pstmt.setBoolean(5, a.isApproved());
+			pstmt.setInt(1, a.getOwnerId().intValue());
+			pstmt.setDouble(2, a.getBalance().doubleValue());
+			pstmt.setString(3, type);
+			pstmt.setBoolean(4, a.isApproved());
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("Account updated");
 		return a;
 	}
 
@@ -148,8 +167,6 @@ public class AccountDaoDB implements AccountDao {
 			pstmt.close();
 		if (stmt != null)
 			stmt.close();
-		if (conn != null)
-			conn.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}

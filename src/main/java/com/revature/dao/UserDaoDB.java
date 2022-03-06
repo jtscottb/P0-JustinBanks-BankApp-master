@@ -37,7 +37,7 @@ public class UserDaoDB implements UserDao {
 			pstmt.setString(3, user.getPassword());
 			pstmt.setString(4, user.getFirstName());
 			pstmt.setString(5, user.getLastName());
-			pstmt.setObject(6, (user.getUserType().equals(u.getUserType())) ? 1 : 2);
+			pstmt.setString(6, (user.getUserType().equals(u.getUserType())) ? "CUSTOMER" : "EMPLOYEE");
 			pstmt.executeUpdate();
 			if (rs != null)
 				rs.close();
@@ -45,8 +45,6 @@ public class UserDaoDB implements UserDao {
 				pstmt.close();
 			if (stmt != null)
 				stmt.close();
-			if (conn != null)
-				conn.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -72,9 +70,11 @@ public class UserDaoDB implements UserDao {
 		User user = new User();
 		List<User> users = getAllUsers();
 		for(User u : users) {
-			if(u.getUsername().equals(username) && u.getPassword().equals(pass)) {
-				user = u;
-				break;
+			if(u.getUsername().equals(username)) {
+				if(u.getPassword().equals(pass)) {
+					user = u;
+					break;
+				}
 			}
 		}
 		return user;
@@ -94,7 +94,7 @@ public class UserDaoDB implements UserDao {
 				user.setPassword(rs.getString("password"));
 				user.setFirstName(rs.getString("firstname"));
 				user.setLastName(rs.getString("lastname"));
-				user.setUserType((UserType) rs.getObject("usertype"));
+				user.setUserType(rs.getString("usertype").equals("CUSTOMER") ? UserType.CUSTOMER : UserType.EMPLOYEE);
 				users.add(user);
 			}
 			if (rs != null)
@@ -103,8 +103,6 @@ public class UserDaoDB implements UserDao {
 				pstmt.close();
 			if (stmt != null)
 				stmt.close();
-			if (conn != null)
-				conn.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -123,7 +121,7 @@ public class UserDaoDB implements UserDao {
 			pstmt.setString(2, u.getPassword());
 			pstmt.setString(3, u.getFirstName());
 			pstmt.setString(4, u.getLastName());
-			pstmt.setObject(5, (u.getUserType().equals(user.getUserType()) ? 1 : 2));
+			pstmt.setString(5, (u.getUserType().equals(user.getUserType()) ? "CUSTOMER" : "EMPLOYEE"));
 			pstmt.executeUpdate();
 			if (rs != null)
 				rs.close();
@@ -131,8 +129,6 @@ public class UserDaoDB implements UserDao {
 				pstmt.close();
 			if (stmt != null)
 				stmt.close();
-			if (conn != null)
-				conn.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -154,8 +150,6 @@ public class UserDaoDB implements UserDao {
 			pstmt.close();
 		if (stmt != null)
 			stmt.close();
-		if (conn != null)
-			conn.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}

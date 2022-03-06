@@ -29,7 +29,7 @@ public class BankApplicationDriver {
 		// your code here...
 		User user;
 		user = Startup();
-		if(SessionCache.getCurrentUser() == null) {
+		if(user == null) {
 			user = SignIn();
 		}
 		Selection(user);
@@ -77,7 +77,7 @@ public class BankApplicationDriver {
 		
 //		SELECT USERNAME
 		System.out.println("Enter username: ");
-		String username = input.next();
+		String username = input.next().toUpperCase();
 		newUser.setUsername(username);
 		
 //		CHOOSE PASSWORD
@@ -109,7 +109,7 @@ public class BankApplicationDriver {
 		
 //		OBTAIN LOGIN INFO
 		System.out.println("Enter username: ");
-		String username = input.next();
+		String username = input.next().toUpperCase();
 		System.out.println("Enter password: ");
 		String password = input.next();
 		
@@ -185,6 +185,7 @@ public class BankApplicationDriver {
 		case 1:	//Apply for new account
 			a = as.createNewAccount(user);
 			a = adf.getAccount(a.getId());
+			a = adb.getAccount(a.getId());
 			
 //			CHOOSE ACCOUNT TYPE
 			System.out.println("Choose account type: \n(1.) Checking \n(2.) Savings");
@@ -199,7 +200,7 @@ public class BankApplicationDriver {
 			}
 			
 			a2 = adf.updateAccount(a);
-			adb.updateAccount(a);
+			a2 = adb.updateAccount(a);
 			System.out.println("Account added \n" + a2);
 			break;
 			
@@ -311,13 +312,16 @@ public class BankApplicationDriver {
 			int accountID = 0;
 			Account a = new Account();
 			boolean approval = false;
+			
 //			GET AND PRINT LIST OF ALL ACCOUNTS
 			accounts = adf.getAccounts();
 			accounts.forEach(account -> System.out.println(account));
+			
 //			CHOOSE AND COPY SELECTED ACCOUNT
 			System.out.println("Enter account number: ");
 			accountID = input.nextInt();
 			a = adf.getAccount(accountID);
+			
 //			CHANGE APPROVAL STATUS
 			System.out.println("Enter \n(1.) Approved \n(2.) Unapproved");
 			approval = (input.nextInt() == 1) ? true : false;

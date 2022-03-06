@@ -19,6 +19,8 @@ import com.revature.beans.Transaction.TransactionType;
 import com.revature.dao.AccountDao;
 import com.revature.dao.AccountDaoDB;
 import com.revature.dao.AccountDaoFile;
+import com.revature.dao.TransactionDaoDB;
+import com.revature.dao.TransactionDaoFile;
 import com.revature.driver.BankApplicationDriver;
 import com.revature.exceptions.OverdraftException;
 import com.revature.utils.SessionCache;
@@ -55,6 +57,8 @@ public class AccountService {
 			Account account = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
 			AccountDaoDB adb = new AccountDaoDB();
+			TransactionDaoFile tdf = new TransactionDaoFile();
+			TransactionDaoDB tdb = new TransactionDaoDB();
 			
 //			COPY ACCOUNT FROM USER FILE
 			account = adf.getAccount(a.getId());
@@ -66,6 +70,8 @@ public class AccountService {
 			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
+			tdf.addTransaction(action);
+			tdb.addTransaction(action);
 			
 //			ADJUST ACCOUNT BALANCE
 			a.setBalance(a.getBalance() - amount);
@@ -75,7 +81,7 @@ public class AccountService {
 			
 //			ADD NEW TRANSACTION AND SET NEW TRANSACTION LIST TO ACCOUNT
 			transactions.add(action);
-			a.setTransactions(transactions);
+//			a.setTransactions(transactions);
 			
 //			UPDATE USER FILE WITH UPDATED ACCOUNT
 			adf.updateAccount(a);
@@ -99,6 +105,8 @@ public class AccountService {
 			Account account = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
 			AccountDaoDB adb = new AccountDaoDB();
+			TransactionDaoFile tdf = new TransactionDaoFile();
+			TransactionDaoDB tdb = new TransactionDaoDB();
 			
 //			COPY ACCOUNT
 			account = adf.getAccount(a.getId());
@@ -110,6 +118,8 @@ public class AccountService {
 			action.setRecipient(null);
 			action.setAmount(amount);
 			action.setTimestamp();
+			tdf.addTransaction(action);
+			tdb.addTransaction(action);
 			
 //			UPDATE ACCOUNT BALANCE
 			a.setBalance(a.getBalance() + amount);
@@ -119,7 +129,7 @@ public class AccountService {
 			transactions.add(action);
 			
 //			SET NEW TRANSACTION TO TRANSACTION LIST IN ACCOUNT
-			a.setTransactions(transactions);
+//			a.setTransactions(transactions);
 			
 //			UPDATE USER FILE WITH UPDATED ACCOUNT
 			adf.updateAccount(a);
@@ -151,6 +161,8 @@ public class AccountService {
 			Account a = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
 			AccountDaoDB adb = new AccountDaoDB();
+			TransactionDaoFile tdf = new TransactionDaoFile();
+			TransactionDaoDB tdb = new TransactionDaoDB();
 			
 //			SENDER TRANSACTION
 //			COPY ACCOUNT
@@ -163,6 +175,8 @@ public class AccountService {
 			t.setRecipient(toAct);
 			t.setAmount(amount);
 			t.setTimestamp();
+			tdf.addTransaction(t);
+			tdb.addTransaction(t);
 			
 //			UPDATE ACCOUNT BALANCE
 			fromAct.setBalance(fromAct.getBalance() - amount);
@@ -171,7 +185,7 @@ public class AccountService {
 			transactions = fromAct.getTransactions();
 			
 //			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
-			fromAct.setTransactions(transactions);
+//			fromAct.setTransactions(transactions);
 			adf.updateAccount(fromAct);
 			adb.updateAccount(fromAct);
 			
@@ -186,6 +200,9 @@ public class AccountService {
 			t.setRecipient(a);
 			t.setAmount(amount);
 			t.setTimestamp();
+			tdf.addTransaction(t);
+			tdb.addTransaction(t);
+			
 //			UPDATE ACCOUNT BALANCE
 			toAct.setBalance(toAct.getBalance() + amount);
 			
@@ -193,7 +210,7 @@ public class AccountService {
 			transactions = toAct.getTransactions();
 			
 //			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
-			toAct.setTransactions(transactions);
+//			toAct.setTransactions(transactions);
 			adf.updateAccount(toAct);
 			adb.updateAccount(toAct);
 		}
@@ -208,6 +225,8 @@ public class AccountService {
 		List<Account> accounts = new ArrayList<Account>();
 		AccountDaoFile adf = new AccountDaoFile();
 		AccountDaoDB adb = new AccountDaoDB();
+		TransactionDaoFile tdf = new TransactionDaoFile();
+		TransactionDaoDB tdb = new TransactionDaoDB();
 		Transaction t = new Transaction();
 		Account account = new Account();
 		
@@ -233,7 +252,8 @@ public class AccountService {
 		t.setAmount(STARTING_BALANCE);
 		t.setTimestamp();
 		t.setType(TransactionType.DEPOSIT);
-		myTransactions.add(t);
+//		tdf.addTransaction(t);
+//		tdb.addTransaction(t);
 		
 //		SET TRANSACTION TO ACCOUNT
 		account.setTransactions(new ArrayList<Transaction>());
@@ -243,7 +263,7 @@ public class AccountService {
 		
 		return account;
 	}
-	
+
 	/**
 	 * Approve or reject an account.
 	 * @param a

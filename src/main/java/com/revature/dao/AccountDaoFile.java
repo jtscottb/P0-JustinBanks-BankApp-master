@@ -36,7 +36,6 @@ public class AccountDaoFile implements AccountDao {
 			oos.writeObject(a);
 			oos.close();
 			fos.close();
-			System.out.println("Account added");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -120,7 +119,6 @@ public class AccountDaoFile implements AccountDao {
 						oos.writeObject(a);
 						oos.close();
 						fos.close();
-						System.out.println("Account updated");
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

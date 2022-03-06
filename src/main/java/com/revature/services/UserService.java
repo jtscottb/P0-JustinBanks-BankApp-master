@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -50,7 +51,7 @@ public class UserService {
 		UserDaoDB udb = new UserDaoDB();
 		User user = (User) udf.getUser(username, password);
 //		User user = (User) udb.getUser(username, password);
-		if(user == null) {
+		if(user.getId() == null) {
 			System.out.println("Incorrect username or password");
 			throw new InvalidCredentialsException();
 		} else {
