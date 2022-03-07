@@ -78,7 +78,6 @@ public class AccountDaoDB implements AccountDao {
 
 	public List<Account> getAccounts() {
 		// TODO Auto-generated method stub
-		Account account = new Account();
 		List<Account> accounts = new ArrayList<Account>();
 		String query = "select * from accounts";
 		
@@ -86,13 +85,14 @@ public class AccountDaoDB implements AccountDao {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 			while(rs.next()) {
+				Account account = new Account();
 				account.setId(rs.getInt("accountid"));
 				account.setOwnerId(rs.getInt("userid"));
 				account.setBalance(rs.getDouble("balance"));
 				
-				if(rs.getString("type") == "CHECKING") {
+				if(rs.getString("type").equals("CHECKING")) {
 					account.setType(AccountType.CHECKING);
-				} else if(rs.getString("type") == "SAVINGS") {
+				} else if(rs.getString("type").equals("SAVINGS")) {
 					account.setType(AccountType.SAVINGS);
 				} else {
 					account.setType(null);
@@ -117,12 +117,13 @@ public class AccountDaoDB implements AccountDao {
 	public List<Account> getAccountsByUser(User u) {
 		// TODO Auto-generated method stub
 		List<Account> accounts = getAccounts();
+		List<Account> myAccounts = new ArrayList<Account>();
 		for(Account a : accounts) {
 			if(a.getOwnerId().equals(u.getId())) {
-				accounts.add(a);
+				myAccounts.add(a);
 			}
 		}
-		return accounts;
+		return myAccounts;
 	}
 
 	public Account updateAccount(Account a) {

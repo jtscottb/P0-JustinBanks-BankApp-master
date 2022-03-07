@@ -186,7 +186,7 @@ public class BankApplicationDriver {
 		case 1:	//Apply for new account
 			a = as.createNewAccount(user);
 			a = adf.getAccount(a.getId());
-			a = adb.getAccount(a.getId());
+//			a = adb.getAccount(a.getId());
 			
 //			CHOOSE ACCOUNT TYPE
 			System.out.println("Choose account type: \n(1.) Checking \n(2.) Savings");
@@ -215,6 +215,7 @@ public class BankApplicationDriver {
 			
 //			COPY ACCOUNT AND PRINT BALANCE
 			a = adf.getAccount(num);
+//			a = adb.getAccount(num);
 			System.out.println(a.getBalance());
 			break;
 			
@@ -226,6 +227,7 @@ public class BankApplicationDriver {
 			System.out.println("\nEnter account number: ");
 			num = input.nextInt();
 			a = adf.getAccount(num);
+//			a = adb.getAccount(num);
 			
 //			ENTER AMOUNT TO DEPOSIT
 			System.out.println("\nEnter amount to deposit: ");
@@ -244,6 +246,7 @@ public class BankApplicationDriver {
 			System.out.println("\nEnter account number: ");
 			num = input.nextInt();
 			a = adf.getAccount(num);
+//			a = adb.getAccount(num);
 			
 //			ENTER AMOUNT TO WITHDRAW
 			System.out.println("\nEnter amount to withdraw: ");
@@ -264,6 +267,7 @@ public class BankApplicationDriver {
 			
 //			COPY WITHDRAW ACCOUNT
 			a = adf.getAccount(num);
+//			a = adb.getAccount(num);
 			
 //			CHOOSE WHICH ACCOUNT TO DEPOSIT INTO
 			System.out.println("\nEnter account number to deposit into: ");
@@ -310,18 +314,21 @@ public class BankApplicationDriver {
 			List<Account> accounts = new ArrayList<Account>();
 			AccountService as = new AccountService(null);
 			AccountDaoFile adf = new AccountDaoFile();
+			AccountDaoDB adb = new AccountDaoDB();
 			int accountID = 0;
 			Account a = new Account();
 			boolean approval = false;
 			
 //			GET AND PRINT LIST OF ALL ACCOUNTS
 			accounts = adf.getAccounts();
+//			accounts = adb.getAccounts();
 			accounts.forEach(account -> System.out.println(account));
 			
 //			CHOOSE AND COPY SELECTED ACCOUNT
 			System.out.println("\nEnter account number: ");
 			accountID = input.nextInt();
 			a = adf.getAccount(accountID);
+//			a = adb.getAccount(accountID);
 			
 //			CHANGE APPROVAL STATUS
 			System.out.println("Enter \n(1.) Approved \n(2.) Unapproved");

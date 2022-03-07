@@ -31,7 +31,6 @@ public class TransactionDaoDB implements TransactionDao {
 	public List<Transaction> getAllTransactions() {
 		// TODO Auto-generated method stub
 		AccountDaoDB adb = new AccountDaoDB();
-		Transaction action = new Transaction();
 		List<Transaction> transactions = new ArrayList<Transaction>();
 		
 		String query = "select * from transactions";
@@ -39,6 +38,7 @@ public class TransactionDaoDB implements TransactionDao {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 			while(rs.next()) {
+				Transaction action = new Transaction();
 				action.setSender(adb.getAccount(rs.getInt("accountid")));
 				action.setRecipient( Objects.isNull(adb.getAccount(rs.getInt("recipientid"))) ? null : adb.getAccount(rs.getInt("recipientid")) );
 				action.setAmount(rs.getDouble("amount"));

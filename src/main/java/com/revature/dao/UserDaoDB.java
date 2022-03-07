@@ -82,13 +82,13 @@ public class UserDaoDB implements UserDao {
 
 	public List<User> getAllUsers() {
 		// TODO Auto-generated method stub
-		User user = new User();
 		List<User> users = new ArrayList<User>();
 		String query = "select * from users";
 		try {
 			pstmt = conn.prepareStatement(query);
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
+				User user = new User();
 				user.setId(rs.getInt("userid"));
 				user.setUsername(rs.getString("username"));
 				user.setPassword(rs.getString("password"));
