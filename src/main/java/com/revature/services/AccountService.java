@@ -52,7 +52,6 @@ public class AccountService {
 			throw new UnsupportedOperationException("Account not approved");
 		} else {
 //			SETUP
-			List<Transaction> transactions = new ArrayList<Transaction>();
 			Transaction action = new Transaction();
 			Account account = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
@@ -76,13 +75,6 @@ public class AccountService {
 //			ADJUST ACCOUNT BALANCE
 			a.setBalance(a.getBalance() - amount);
 			
-//			COPY EXISTING TRANSACTIONS
-			transactions = a.getTransactions();
-			
-//			ADD NEW TRANSACTION AND SET NEW TRANSACTION LIST TO ACCOUNT
-			transactions.add(action);
-//			a.setTransactions(transactions);
-			
 //			UPDATE USER FILE WITH UPDATED ACCOUNT
 			adf.updateAccount(a);
 			adb.updateAccount(a);
@@ -100,7 +92,6 @@ public class AccountService {
 			throw new UnsupportedOperationException("Account not approved");
 		} else {
 //			SETUP
-			List<Transaction> transactions = new ArrayList<Transaction>();
 			Transaction action = new Transaction();
 			Account account = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
@@ -123,13 +114,6 @@ public class AccountService {
 			
 //			UPDATE ACCOUNT BALANCE
 			a.setBalance(a.getBalance() + amount);
-			
-//			COPY EXISTING TRANSACTIONS AND ADD NEW TRANSACTION TO LIST
-			transactions = a.getTransactions();
-			transactions.add(action);
-			
-//			SET NEW TRANSACTION TO TRANSACTION LIST IN ACCOUNT
-//			a.setTransactions(transactions);
 			
 //			UPDATE USER FILE WITH UPDATED ACCOUNT
 			adf.updateAccount(a);
@@ -156,7 +140,6 @@ public class AccountService {
 		} else if(!toAct.isApproved()) {
 			throw new UnsupportedOperationException("Recipient account is not approved");
 		} else {
-			List<Transaction> transactions = new ArrayList<Transaction>();
 			Transaction t = new Transaction();
 			Account a = new Account();
 			AccountDaoFile adf = new AccountDaoFile();
@@ -181,17 +164,13 @@ public class AccountService {
 //			UPDATE ACCOUNT BALANCE
 			fromAct.setBalance(fromAct.getBalance() - amount);
 			
-//			COPY TRANSACTIONS FROM ACCOUNT AND ADD NEW TRANSACTION
-			transactions = fromAct.getTransactions();
-			
 //			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
-//			fromAct.setTransactions(transactions);
 			adf.updateAccount(fromAct);
 			adb.updateAccount(fromAct);
 			
 //			RECEIVER TRANSACTION
 //			COPY ACCOUNT
-			a = adf.getAccount(fromAct.getId());
+			a = adf.getAccount(toAct.getId());
 //			a = adb.getAccount(toAct.getId());
 			
 //			SETUP NEW TRANSACTION DETAILS
@@ -206,11 +185,7 @@ public class AccountService {
 //			UPDATE ACCOUNT BALANCE
 			toAct.setBalance(toAct.getBalance() + amount);
 			
-//			COPY TRANSACTIONS FROM ACCOUNT AND ADD NEW TRANSACTION
-			transactions = toAct.getTransactions();
-			
 //			UPDATE ACCOUNT WITH NEW TRANSACTIONS LIST AND UPDATE USER FILE
-//			toAct.setTransactions(transactions);
 			adf.updateAccount(toAct);
 			adb.updateAccount(toAct);
 		}
@@ -221,7 +196,6 @@ public class AccountService {
 	 * @return the Account object that was created
 	 */
 	public Account createNewAccount(User u) {
-		List<Transaction> myTransactions = new ArrayList<>();
 		List<Account> accounts = new ArrayList<Account>();
 		AccountDaoFile adf = new AccountDaoFile();
 		AccountDaoDB adb = new AccountDaoDB();
@@ -231,12 +205,13 @@ public class AccountService {
 		Account account = new Account();
 		
 		account.setBalance(STARTING_BALANCE);
-		account.setApproved(false);
+		account.setApproved(true);
 		account.setOwnerId(u.getId());
 		
 //		FIND NEXT AVAILABLE ACCOUNT NUMBER
 		int accountID = 0;
 		accounts = adf.getAccounts();
+//		accounts = adb.getAccounts();
 		for(Account a : accounts) {
 			if(accounts.isEmpty()) {
 				accountID = 1;
@@ -249,11 +224,13 @@ public class AccountService {
 		account.setId(accountID + 1);
 		
 //		GENERATE TRANSACTION DETAIL FOR STARTING BALANCE
+		t.setSender(account);
+		t.setRecipient(null);
 		t.setAmount(STARTING_BALANCE);
 		t.setTimestamp();
 		t.setType(TransactionType.DEPOSIT);
-//		tdf.addTransaction(t);
-//		tdb.addTransaction(t);
+		tdf.addTransaction(t);
+		tdb.addTransaction(t);
 		
 //		SET TRANSACTION TO ACCOUNT
 		account.setTransactions(new ArrayList<Transaction>());

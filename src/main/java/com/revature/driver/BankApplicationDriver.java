@@ -12,6 +12,7 @@ import com.revature.beans.User.UserType;
 import com.revature.dao.AccountDao;
 import com.revature.dao.AccountDaoDB;
 import com.revature.dao.AccountDaoFile;
+import com.revature.dao.TransactionDaoDB;
 import com.revature.dao.TransactionDaoFile;
 import com.revature.dao.UserDao;
 import com.revature.dao.UserDaoDB;
@@ -161,7 +162,7 @@ public class BankApplicationDriver {
 		Scanner input = new Scanner(System.in);
 		int choice = 0;
 
-		System.out.println("What would you like to do?: "
+		System.out.println("\nWhat would you like to do?: "
 				+ "\n(1.) Apply for new account"
 				+ "\n(2.) View balance of my account"
 				+ "\n(3.) Deposit to an account"
@@ -209,7 +210,7 @@ public class BankApplicationDriver {
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + "\t" + account.getType()));
 			
 //			SELECT ACCOUNT TO VIEW BALANCE
-			System.out.println("Enter account number: ");
+			System.out.println("\nEnter account number: ");
 			num = input.nextInt();
 			
 //			COPY ACCOUNT AND PRINT BALANCE
@@ -222,12 +223,12 @@ public class BankApplicationDriver {
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + "\t" + account.getType()));
 			
 //			CHOOSE ACCOUNT TO DEPOSIT AND COPY ACCOUNT
-			System.out.println("Enter account number: ");
+			System.out.println("\nEnter account number: ");
 			num = input.nextInt();
 			a = adf.getAccount(num);
 			
 //			ENTER AMOUNT TO DEPOSIT
-			System.out.println("Enter amount to deposit: ");
+			System.out.println("\nEnter amount to deposit: ");
 			amount = input.nextDouble();
 			
 //			DEPOSIT AMOUNT AND PRINT UPDATED ACCOUNT
@@ -240,12 +241,12 @@ public class BankApplicationDriver {
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + "\t" + account.getType()));
 			
 //			CHOOSE ACCOUNT TO WITHDRAW AND COPY ACCOUNT
-			System.out.println("Enter account number: ");
+			System.out.println("\nEnter account number: ");
 			num = input.nextInt();
 			a = adf.getAccount(num);
 			
 //			ENTER AMOUNT TO WITHDRAW
-			System.out.println("Enter amount to withdraw: ");
+			System.out.println("\nEnter amount to withdraw: ");
 			amount = input.nextDouble();
 			
 //			WITHDRAW AMOUNT AND PRINT UPDATED ACCOUNT
@@ -258,14 +259,14 @@ public class BankApplicationDriver {
 			accounts.forEach((account) -> System.out.println("Account ID: " + account.getId() + "\t" + account.getType()));
 			
 //			CHOOSE WHICH ACCOUNT TO WITHDRAW FROM
-			System.out.println("Enter account number to withdraw from: ");
+			System.out.println("\nEnter account number to withdraw from: ");
 			num = input.nextInt();
 			
 //			COPY WITHDRAW ACCOUNT
 			a = adf.getAccount(num);
 			
 //			CHOOSE WHICH ACCOUNT TO DEPOSIT INTO
-			System.out.println("Enter account number to deposit into: ");
+			System.out.println("\nEnter account number to deposit into: ");
 			int num2 = input.nextInt();
 			
 //			COPY DEPOSIT ACCOUNT
@@ -273,7 +274,7 @@ public class BankApplicationDriver {
 			a2 = adf2.getAccount(num2);
 			
 //			SET TRANSFER AMOUNT
-			System.out.println("Enter amount to transfer: ");
+			System.out.println("\nEnter amount to transfer: ");
 			amount = input.nextDouble();
 			
 //			TRANSFER AMOUNT AND PRINT BOTH UPDATED ACCOUNTS
@@ -296,7 +297,7 @@ public class BankApplicationDriver {
 		Scanner input = new Scanner(System.in);
 		int choice = 0;
 		
-		System.out.println("What would you like to do?: "
+		System.out.println("\nWhat would you like to do?: "
 				+ "\n(1.) Approve or reject an account"
 				+ "\n(2.) View log of all transactions"
 				+ "\n(3.) Exit");
@@ -318,7 +319,7 @@ public class BankApplicationDriver {
 			accounts.forEach(account -> System.out.println(account));
 			
 //			CHOOSE AND COPY SELECTED ACCOUNT
-			System.out.println("Enter account number: ");
+			System.out.println("\nEnter account number: ");
 			accountID = input.nextInt();
 			a = adf.getAccount(accountID);
 			
@@ -331,10 +332,12 @@ public class BankApplicationDriver {
 		case 2:
 //			SETUP
 			TransactionDaoFile tdf = new TransactionDaoFile();
+			TransactionDaoDB tdb = new TransactionDaoDB();
 			List<Transaction> allTransactions = new ArrayList<Transaction>();
 			
 //			GET LIST OF ALL TRANSACTIONS BY ALL USERS
 			allTransactions = tdf.getAllTransactions();
+//			allTransactions = tdb.getAllTransactions();
 			
 //			PRINT ALL TRANSACTIONS
 			allTransactions.forEach((account) -> System.out.println(account));

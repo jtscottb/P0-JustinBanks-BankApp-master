@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.revature.beans.Account;
 import com.revature.beans.Transaction;
@@ -29,6 +30,7 @@ public class TransactionDaoDB implements TransactionDao {
 
 	public List<Transaction> getAllTransactions() {
 		// TODO Auto-generated method stub
+		AccountDaoDB adb = new AccountDaoDB();
 		Transaction action = new Transaction();
 		List<Transaction> transactions = new ArrayList<Transaction>();
 		
@@ -37,8 +39,8 @@ public class TransactionDaoDB implements TransactionDao {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 			while(rs.next()) {
-				action.setSender((Account) rs.getObject("accountid"));
-				action.setRecipient((Account) rs.getObject("recipientid"));
+				action.setSender(adb.getAccount(rs.getInt("accountid")));
+				action.setRecipient( Objects.isNull(adb.getAccount(rs.getInt("recipientid"))) ? null : adb.getAccount(rs.getInt("recipientid")) );
 				action.setAmount(rs.getDouble("amount"));
 				String type = rs.getString("type");
 				switch(type) {
@@ -67,7 +69,7 @@ public class TransactionDaoDB implements TransactionDao {
 	
 	public Transaction addTransaction(Transaction t) {
 		// TODO Auto-generated method stub
-		String query = "insert into accounts (accountid, recipientid, amount, type, timestamp) values (?, ?, ?, ?, ?)";
+		String query = "insert into transactions (accountid, recipientid, amount, type, timestamp) values (?, ?, ?, ?, ?)";
 		Transaction transaction1 = new Transaction();
 		Transaction transaction2 = new Transaction();
 		Transaction transaction3 = new Transaction();
@@ -85,8 +87,7 @@ public class TransactionDaoDB implements TransactionDao {
 		}
 		
 		int senderID = t.getSender().getId();
-		int recipientID = t.getRecipient().getId();
-		System.out.println(senderID + "\n" + recipientID);
+		int recipientID = Objects.isNull(t.getRecipient()) ? 0 : t.getRecipient().getId();
 		
 		try {
 			pstmt = conn.prepareStatement(query);

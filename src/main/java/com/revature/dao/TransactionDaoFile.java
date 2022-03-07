@@ -28,7 +28,7 @@ public class TransactionDaoFile implements TransactionDao {
 		
 		for(File f : files) {
 			try {
-				FileInputStream fis = new FileInputStream(fileLocation + "\\" + f.getName());
+				FileInputStream fis = new FileInputStream(fileLocation + "/" + f.getName());
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				t = (Transaction) ois.readObject();
 				transactions.add(t);
@@ -52,18 +52,25 @@ public class TransactionDaoFile implements TransactionDao {
 	
 	public Transaction addTransaction(Transaction t) {
 		File[] files = new File(fileLocation).listFiles();
-		int num = 1;
+		List<Integer> docNums = new ArrayList<Integer>();
+		int num = 0;
 		
 //		FIND NEXT DOC NUMBER
 		for(File f : files) {
 			int doc = Integer.parseInt(f.getName().split("\\.", 2)[0]);
-			num = (doc > num) ? doc : num;
+			docNums.add(doc);
+		}
+		if(docNums.isEmpty()) {
+			num = 1;
+		} else {
+			num = Collections.max(docNums) + 1;
 		}
 		
 		try {
 			FileOutputStream fos = new FileOutputStream(fileLocation + "\\" + num + ".txt");
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(t);
+			oos.reset();
 			oos.close();
 			fos.close();
 		} catch (FileNotFoundException e) {
@@ -83,25 +90,45 @@ public class TransactionDaoFile implements TransactionDao {
 		List<Transaction> transactions = new ArrayList<Transaction>();
 		
 		for(Transaction trans : getAllTransactions()) {
-			if(trans.getSender().equals(a)) {
+			if(trans.getSender().getId().equals(a.getId())) {
 				transactions.add(trans);
 			}
 		}
-		
 		return transactions;
 	}
 	
 	public boolean removeTransaction(Transaction t) {
+		Transaction transaction = new Transaction();
 		boolean removed = false;
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File f : files) {
-			String docNum = f.getName().split("\\.", 2)[0];
-			if(t.getTimestamp().toString().equals(docNum)) {
-				removed = f.delete();
+			try {
+				FileInputStream fis = new FileInputStream(fileLocation + "/" + f.getName());
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				transaction = (Transaction) ois.readObject();
+				
+				if(t.getTimestamp().equals(transaction.getTimestamp())) {
+					removed = f.delete();
+					break;
+				}
+				
+				ois.close();
+				fis.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
 			}
 		}
-		
 		return removed;
 	}
 
