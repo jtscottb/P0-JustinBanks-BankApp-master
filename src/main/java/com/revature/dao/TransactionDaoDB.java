@@ -51,7 +51,7 @@ public class TransactionDaoDB implements TransactionDao {
 				case "TRANSFER":
 					action.setType(TransactionType.TRANSFER);
 				}
-				action.setTimestamp((LocalDateTime) rs.getObject("timestamp"));
+				action.setTimestamp((LocalDateTime) rs.getTimestamp("timestamp").toLocalDateTime());
 				transactions.add(action);
 			}
 			if (rs != null)
@@ -125,6 +125,18 @@ public class TransactionDaoDB implements TransactionDao {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
+	}
+	
+	public List<Transaction> getTransactionByAccount(Account a) {
+		List<Transaction> transactions= new ArrayList<Transaction>();
+		List<Transaction> tList = getAllTransactions();
+		for(Transaction t : tList) {
+			if(t.getSender().getId().equals(a.getId())) {
+				transactions.add(t);
+			}
+		}
+		
+		return transactions;
 	}
 
 }

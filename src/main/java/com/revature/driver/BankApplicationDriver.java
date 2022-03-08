@@ -135,13 +135,13 @@ public class BankApplicationDriver {
 			//As a customer, I can view the balance of a specific account					DONE - 1 
 			//As a customer, I can make a deposit to a specific account						DONE - 2
 			//As a customer, I can make a withdrawal from a specific account				DONE - 2
-			//As a customer, I can post a money transfer to another account.
-			//8
+			//As a customer, I can post a money transfer to another account.				DONE - 3
+			//																						11
 			Customer(user);
 		} else if(user.getUserType().equals(employee.getUserType())) {
 			//As an employee, I can approve or reject an account.		DONE - 2
 			//As an employee, I can view a log of all transactions.		DONE - 2
-			//4
+			//																	4
 			Employee(user);
 		}
 		
@@ -155,7 +155,7 @@ public class BankApplicationDriver {
 			//As the system, I reject deposits or withdrawals of negative money					DONE - 2
 			//As the system, I reject any transactions of unapproved accounts					DONE - 1
 			//As the system, I reject invalid transfers (negative amounts or overdrafts)		DONE - 1
-		//9
+		//																								9
 	}
 	
 	public static void Customer(User user) {
