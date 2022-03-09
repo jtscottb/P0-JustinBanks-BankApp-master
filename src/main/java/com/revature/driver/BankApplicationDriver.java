@@ -130,32 +130,37 @@ public class BankApplicationDriver {
 		User employee = new User();
 		employee.setUserType(UserType.EMPLOYEE);
 		
+		System.out.println("\nWelcome " + user.getFirstName() + " " + user.getLastName());
+		
 		if(user.getUserType().equals(customer.getUserType())) {
-			//As a customer, I can apply for a new bank account with a starting balance		DONE - 3
-			//As a customer, I can view the balance of a specific account					DONE - 1 
-			//As a customer, I can make a deposit to a specific account						DONE - 2
-			//As a customer, I can make a withdrawal from a specific account				DONE - 2
-			//As a customer, I can post a money transfer to another account.				DONE - 3
-			//																						11
+			/*	As a customer, I can apply for a new bank account with a starting balance	DONE - 3
+				As a customer, I can view the balance of a specific account					DONE - 1 
+				As a customer, I can make a deposit to a specific account					DONE - 2
+				As a customer, I can make a withdrawal from a specific account				DONE - 2
+				As a customer, I can post a money transfer to another account.				DONE - 3
+																							TOTAL - 11
+			*/
 			Customer(user);
 		} else if(user.getUserType().equals(employee.getUserType())) {
-			//As an employee, I can approve or reject an account.		DONE - 2
-			//As an employee, I can view a log of all transactions.		DONE - 2
-			//																	4
+			/*	As an employee, I can approve or reject an account.		DONE - 2
+				As an employee, I can view a log of all transactions.	DONE - 2
+																		TOTAL - 4
+			*/
 			Employee(user);
 		}
 		
-		//USER
-			//As a user, I can register with a username and password 	DONE - 1
-			//As a user, I can login with a username and password	 	DONE - 1
-		//SYSTEM
-			//As the system, I reject registration attempts for usernames that already exist	DONE - 1
-			//As the system, I reject login attempts with invalid credentials					DONE - 1
-			//As the system, I reject and prevent overdrafts									DONE - 1
-			//As the system, I reject deposits or withdrawals of negative money					DONE - 2
-			//As the system, I reject any transactions of unapproved accounts					DONE - 1
-			//As the system, I reject invalid transfers (negative amounts or overdrafts)		DONE - 1
-		//																								9
+		/*	USER
+				As a user, I can register with a username and password 		DONE - 1
+				As a user, I can login with a username and password	 		DONE - 1
+			SYSTEM
+				As the system, I reject registration attempts for usernames that already exist	DONE - 1
+				As the system, I reject login attempts with invalid credentials					DONE - 1
+				As the system, I reject and prevent overdrafts									DONE - 1
+				As the system, I reject deposits or withdrawals of negative money				DONE - 2
+				As the system, I reject any transactions of unapproved accounts					DONE - 1
+				As the system, I reject invalid transfers (negative amounts or overdrafts)		DONE - 1
+																								TOTAL - 9
+		 */
 	}
 	
 	public static void Customer(User user) {
@@ -304,19 +309,21 @@ public class BankApplicationDriver {
 		System.out.println("\nWhat would you like to do?: "
 				+ "\n(1.) Approve or reject an account"
 				+ "\n(2.) View log of all transactions"
-				+ "\n(3.) Exit");
+				+ "\n(3.) Delete an account"
+				+ "\n(4.) Exit");
 			
 		choice = input.nextInt();
+		
+		List<Account> accounts = new ArrayList<Account>();
+		AccountService as = new AccountService(null);
+		AccountDaoFile adf = new AccountDaoFile();
+		AccountDaoDB adb = new AccountDaoDB();
+		Account a = new Account();
+		int accountID = 0;
 		
 		switch(choice) {
 		case 1:
 //			SETUP
-			List<Account> accounts = new ArrayList<Account>();
-			AccountService as = new AccountService(null);
-			AccountDaoFile adf = new AccountDaoFile();
-			AccountDaoDB adb = new AccountDaoDB();
-			int accountID = 0;
-			Account a = new Account();
 			boolean approval = false;
 			
 //			GET AND PRINT LIST OF ALL ACCOUNTS
@@ -349,15 +356,48 @@ public class BankApplicationDriver {
 //			PRINT ALL TRANSACTIONS
 			allTransactions.forEach((account) -> System.out.println(account));
 			break;
+			
 		case 3:
+//			GET AND PRINT LIST OF ALL ACCOUNTS
+			accounts = adf.getAccounts();
+//			accounts = adb.getAccounts();
+			accounts.forEach(account -> System.out.println(account));
+			
+//			DELETE SELECTED ACCOUNT AND TRANSACTIONS
+			System.out.println("\nEnter account number: ");
+			accountID = input.nextInt();
+			DeleteAccount(accountID);
+			break;
+			
+		case 4:
 			input.close();
 			break;
 		}
-		if(choice > 2) {
+		if(choice > 3) {
 			System.out.println("Goodbye");
 		} else {
 			Employee(user);
 		}
+	}
+	
+	
+	public static void DeleteAccount(Integer accountID) {
+		AccountDaoFile adf = new AccountDaoFile();
+		AccountDaoDB adb = new AccountDaoDB();
+		TransactionDaoFile tdf = new TransactionDaoFile();
+		TransactionDaoDB tdb = new TransactionDaoDB();
+		
+		Account a = adf.getAccount(accountID);
+//		Account a = adb.getAccount(accountID);
+		List<Transaction> transactions = tdf.getTransactionsByAccount(a);
+//		List<Transaction> transactions = tdb.getTransactionsByAccount(a);
+		adf.removeAccount(a);
+		adb.removeAccount(a);
+		for(Transaction t : transactions) {
+			tdf.removeTransactionsByAccount(a);
+			tdb.removeTransactionsByAccount(a);
+		}
+		System.out.println("Account deleted successfully");
 	}
 	
 	//End of bank driver class

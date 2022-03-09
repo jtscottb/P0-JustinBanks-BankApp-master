@@ -110,24 +110,7 @@ public class TransactionDaoDB implements TransactionDao {
 		return t;
 	}
 	
-	public void removeTransaction(Transaction t) {
-		String query = "delete from transactions where timestamp=" + t.getTimestamp();
-		try {
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(query);
-			if (rs != null)
-				rs.close();
-			if (pstmt != null)
-				pstmt.close();
-			if (stmt != null)
-				stmt.close();
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-	}
-	
-	public List<Transaction> getTransactionByAccount(Account a) {
+	public List<Transaction> getTransactionsByAccount(Account a) {
 		List<Transaction> transactions= new ArrayList<Transaction>();
 		List<Transaction> tList = getAllTransactions();
 		for(Transaction t : tList) {
@@ -138,5 +121,26 @@ public class TransactionDaoDB implements TransactionDao {
 		
 		return transactions;
 	}
+	
+	public boolean removeTransactionsByAccount(Account a) {
+		String query = "delete from transactions where accountid=" + a.getId();
+		boolean status = false;
+		try {
+			stmt = conn.createStatement();
+			status = stmt.execute(query);
+			if (rs != null)
+				rs.close();
+			if (pstmt != null)
+				pstmt.close();
+			if (stmt != null)
+				stmt.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return status;
+	}
+	
+
 
 }

@@ -97,20 +97,20 @@ public class TransactionDaoFile implements TransactionDao {
 		return transactions;
 	}
 	
-	public boolean removeTransaction(Transaction t) {
+	public boolean removeTransactionsByAccount(Account a) {
 		Transaction transaction = new Transaction();
 		boolean removed = false;
 		File[] files = new File(fileLocation).listFiles();
 		
 		for(File f : files) {
 			try {
-				FileInputStream fis = new FileInputStream(fileLocation + "/" + f.getName());
+				FileInputStream fis = new FileInputStream(fileLocation + "\\" + f.getName());
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				transaction = (Transaction) ois.readObject();
 				
-				if(t.getTimestamp().equals(transaction.getTimestamp())) {
+				if(transaction.getSender().getId().equals(a.getId())) {
 					removed = f.delete();
-					break;
+					System.out.println(removed);
 				}
 				
 				ois.close();

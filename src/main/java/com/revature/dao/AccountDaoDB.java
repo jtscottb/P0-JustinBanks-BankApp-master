@@ -157,8 +157,8 @@ public class AccountDaoDB implements AccountDao {
 
 	public boolean removeAccount(Account a) {
 		// TODO Auto-generated method stub
-		boolean status = false;
 		String query = "delete from accounts where accountid =" + a.getId().intValue();
+		boolean status = false;
 		try {
 		stmt = conn.createStatement();
 		status = stmt.execute(query);
@@ -171,7 +171,6 @@ public class AccountDaoDB implements AccountDao {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		System.out.println((status) ? "Account removed" : "Account removal failed");
 		return status;
 	}
 
