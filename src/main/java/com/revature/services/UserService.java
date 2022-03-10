@@ -52,7 +52,6 @@ public class UserService {
 		User user = (User) udf.getUser(username, password);
 //		User user = (User) udb.getUser(username, password);
 		if(user.getId() == null) {
-			System.out.println("Incorrect username or password");
 			throw new InvalidCredentialsException();
 		} else {
 			System.out.println("Log in successful");
@@ -80,10 +79,9 @@ public class UserService {
 		
 //		THROW EXCEPTION IF USERNAME EXISTS
 		if(usernameList.contains(newUser.getUsername())) {
-			System.out.println("Username already taken");
 			throw new UsernameAlreadyExistsException();
 		} else {
-//			FIND NEXT AVAILABLE USER ID NUMBER FROM USER LIST
+//		FIND NEXT AVAILABLE USER ID NUMBER FROM USER LIST
 			int nextID = 0;
 			for(User u : users) {
 				if(users.isEmpty()) {

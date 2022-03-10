@@ -140,7 +140,4 @@ public class TransactionDaoDB implements TransactionDao {
 		}
 		return status;
 	}
-	
-
-
 }

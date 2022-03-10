@@ -87,7 +87,7 @@ public class AccountService {
 	 */
 	public void deposit(Account a, Double amount) {
 		if (amount < 0) {
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException("Cannot deposit a negative amount");
 		} else if(!a.isApproved()) {
 			throw new UnsupportedOperationException("Account not approved");
 		} else {
@@ -236,7 +236,6 @@ public class AccountService {
 		account.setTransactions(new ArrayList<Transaction>());
 		adf.addAccount(account);
 		adb.addAccount(account);
-		System.out.println("Account created");
 		
 		return account;
 	}
