@@ -68,10 +68,12 @@ public class UserService {
 		UserDaoFile udf = new UserDaoFile();
 		UserDaoDB udb = new UserDaoDB();
 		
-//		CHECK TO SEE IF ANOTHER USER HAS USERNAME
+//		CREATE LIST OF USERS
 		List<User> users = new ArrayList<User>();
 		users = udf.getAllUsers();
 //		users = udb.getAllUsers();
+		
+//		CREATE LIST OF USERNAMES FROM USERS LIST
 		List<String> usernameList = new ArrayList<String>();
 		for(User u : users) {
 			usernameList.add(u.getUsername());
@@ -94,7 +96,7 @@ public class UserService {
 //			ASSIGN NEXT ID NUMBER TO NEW USER
 			newUser.setId(nextID + 1);
 			
-	//		CREATE NEW USER FILE
+//			CREATE NEW USER FILE
 			udf.addUser(newUser);
 			udb.addUser(newUser);
 			System.out.println("User registered successfully!");
